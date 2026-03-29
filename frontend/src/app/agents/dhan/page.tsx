@@ -1,13 +1,13 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useMemo } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
-import { Loader2, Send } from "lucide-react"
+import { Loader2, Send, TrendingUp, AlertCircle } from "lucide-react"
 import { parseMarkdown } from "@/lib/markdown"
 import { useLocalStorage } from "@/hooks/use-local-storage"
 
@@ -186,165 +186,268 @@ export default function DhanPage() {
 
   if (!hasLoaded) return null
 
+  // Skeleton Loader Component
+  const SkeletonLoader = () => (
+    <div className="space-y-4">
+      {[1, 2, 3, 4].map(i => (
+        <div key={i} className="p-4 bg-gradient-to-r from-slate-200/30 to-slate-100/30 dark:from-slate-800/30 dark:to-slate-700/30 rounded-2xl border border-slate-200/30 dark:border-slate-700/30 animate-pulse h-24" />
+      ))}
+    </div>
+  )
+
   return (
-    <div className="container mx-auto p-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold flex items-center gap-3">
-          💪 DhanRaksha
-          <Badge className="bg-red-500 hover:bg-red-600 text-white border-0">AI Agent Active</Badge>
-        </h1>
-        <p className="text-muted-foreground mt-2">
-          Diagnostic Health Agent — get personalized wellness scores.
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-b from-slate-50/50 to-slate-100/50 dark:from-slate-950/50 dark:to-slate-900/50">
+      <div className="container mx-auto p-4 md:p-8">
+        {/* Header Section */}
+        <div className="mb-10 animate-fade-in">
+          <div className="flex items-center gap-4 mb-3">
+            <div className="p-3 bg-gradient-to-br from-red-500/20 to-red-600/10 rounded-2xl border border-red-200/30 dark:border-red-800/30">
+              <span className="text-2xl">💪</span>
+            </div>
+            <div className="flex-1">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
+                DhanRaksha
+              </h1>
+              <p className="text-muted-foreground mt-1">Financial Health Diagnostic & Wellness Score</p>
+            </div>
+            <Badge className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white border-0 px-4 py-1.5 text-sm font-semibold">
+              Active
+            </Badge>
+          </div>
+        </div>
 
-      <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
-        {/* Form and Results Side */}
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Health Assessment Form</CardTitle>
-              <CardDescription>Answer a few questions to map your metrics to the AI</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Monthly Income (₹)</Label>
-                  <Input type="number" value={formData.monthlyIncome} onChange={(e) => handleChange("monthlyIncome", e.target.value)} />
+        <div className="grid gap-8 lg:grid-cols-2 lg:items-start">
+          {/* Left Column - Form & Results */}
+          <div className="space-y-6">
+            {/* Assessment Form Card */}
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden">
+              <div className="h-1 bg-gradient-to-r from-red-500 via-orange-500 to-red-600" />
+              <CardHeader className="pb-4">
+                <div className="space-y-1">
+                  <CardTitle className="text-2xl flex items-center gap-2">
+                    <span>Health Assessment</span>
+                  </CardTitle>
+                  <CardDescription>Fill in your financial metrics to generate insights</CardDescription>
                 </div>
-                <div className="space-y-2">
-                  <Label>Monthly Expenses (₹)</Label>
-                  <Input type="number" value={formData.monthlyExpenses} onChange={(e) => handleChange("monthlyExpenses", e.target.value)} />
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid md:grid-cols-2 gap-5">
+                  {[
+                    { label: "Monthly Income (₹)", field: "monthlyIncome" },
+                    { label: "Monthly Expenses (₹)", field: "monthlyExpenses" },
+                    { label: "Emergency Fund (₹)", field: "emergencyFund" },
+                    { label: "Total Debt (₹)", field: "totalDebt" },
+                    { label: "Total Investments (₹)", field: "investments" },
+                    { label: "Age (years)", field: "age" },
+                  ].map(({ label, field }) => (
+                    <div key={field} className="space-y-2 group">
+                      <Label className="text-sm font-medium text-slate-700 dark:text-slate-300 group-focus-within:text-red-600 transition-colors">
+                        {label}
+                      </Label>
+                      <Input
+                        type="number"
+                        value={formData[field as keyof typeof formData]}
+                        onChange={(e) => handleChange(field, e.target.value)}
+                        className="border-slate-200/50 dark:border-slate-700/50 focus:border-red-400 focus:ring-red-400/20 h-10 placeholder:text-slate-400 transition-all duration-200"
+                        placeholder="0"
+                      />
+                    </div>
+                  ))}
                 </div>
-                <div className="space-y-2">
-                  <Label>Emergency Fund (₹)</Label>
-                  <Input type="number" value={formData.emergencyFund} onChange={(e) => handleChange("emergencyFund", e.target.value)} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Total Debt (₹)</Label>
-                  <Input type="number" value={formData.totalDebt} onChange={(e) => handleChange("totalDebt", e.target.value)} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Total Investments (₹)</Label>
-                  <Input type="number" value={formData.investments} onChange={(e) => handleChange("investments", e.target.value)} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Age</Label>
-                  <Input type="number" value={formData.age} onChange={(e) => handleChange("age", e.target.value)} />
-                </div>
-              </div>
-              <Button onClick={calculateHealthScore} disabled={calculating} className="w-full bg-red-600 hover:bg-red-700">
-                {calculating ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Calculating...</> : "Generate Diagnostic"}
-              </Button>
-            </CardContent>
-          </Card>
+                
+                <Button
+                  onClick={calculateHealthScore}
+                  disabled={calculating}
+                  className="w-full h-12 text-base font-semibold bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {calculating ? (
+                    <>
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      Analyzing...
+                    </>
+                  ) : (
+                    <>
+                      <TrendingUp className="w-5 h-5 mr-2" />
+                      Generate Health Score
+                    </>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
 
-          {result && (
-            <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Health Score</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center mb-6">
-                    <p className={`text-6xl font-bold ${getScoreColor(result.overallScore)}`}>
-                      {result.overallScore}
-                    </p>
-                    <p className="text-xl text-muted-foreground mt-2">{getScoreLabel(result.overallScore)}</p>
-                    <Progress value={result.overallScore} className="mt-4 h-3 bg-red-100" />
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-4 mt-6">
-                    <div className="p-4 bg-muted/40 rounded-xl border">
-                      <p className="text-sm text-muted-foreground">Savings Rate</p>
-                      <p className="text-2xl font-bold">{result.savingsRate.toFixed(1)}%</p>
-                      <Progress value={result.breakdown.savings * 5} className="mt-2 text-red-500" />
-                    </div>
-                    <div className="p-4 bg-muted/40 rounded-xl border">
-                      <p className="text-sm text-muted-foreground">Emergency Fund</p>
-                      <p className="text-2xl font-bold">{result.emergencyMonths.toFixed(1)} mo</p>
-                      <Progress value={result.breakdown.emergency * 5} className="mt-2 text-red-500" />
-                    </div>
-                    <div className="p-4 bg-muted/40 rounded-xl border">
-                      <p className="text-sm text-muted-foreground">Debt-to-Income</p>
-                      <p className="text-2xl font-bold">{result.debtToIncome.toFixed(1)}%</p>
-                      <Progress value={result.breakdown.debt * 5} className="mt-2 text-red-500" />
-                    </div>
-                    <div className="p-4 bg-muted/40 rounded-xl border">
-                      <p className="text-sm text-muted-foreground">Investment Ratio</p>
-                      <p className="text-2xl font-bold">{result.investmentRatio.toFixed(1)}x</p>
-                      <Progress value={result.breakdown.investment * 5} className="mt-2 text-red-500" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {result.recommendations.length > 0 && (
-                <Card className="border-red-200 bg-red-50">
+            {/* Results Cards */}
+            {result && (
+              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-6 duration-500">
+                {/* Overall Score Card */}
+                <Card className="border-0 shadow-lg overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100/50 dark:from-slate-900/50 dark:to-slate-800/30">
+                  <div className="h-1 bg-gradient-to-r from-red-500 via-orange-500 to-red-600" />
                   <CardHeader>
-                    <CardTitle className="text-red-800 text-lg">💡 Areas to Improve</CardTitle>
+                    <CardTitle className="text-xl">Overall Health Score</CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2">
-                      {result.recommendations.map((rec: string, idx: number) => (
-                        <li key={idx} className="flex items-start gap-2 text-red-700">
-                          <span className="font-bold">•</span>
-                          <span className="text-sm font-medium">{rec}</span>
-                        </li>
-                      ))}
-                    </ul>
+                  <CardContent className="space-y-6">
+                    <div className="space-y-4">
+                      <div className="flex items-end gap-4">
+                        <div className="flex-1">
+                          <p className={`text-6xl font-black tracking-tight ${getScoreColor(result.overallScore)}`}>
+                            {result.overallScore}
+                          </p>
+                          <p className="text-sm text-muted-foreground mt-1">out of 100</p>
+                        </div>
+                        <Badge className={`px-4 py-2 text-sm font-semibold ${
+                          result.overallScore >= 80 ? 'bg-green-500/20 text-green-700 dark:text-green-400' :
+                          result.overallScore >= 60 ? 'bg-yellow-500/20 text-yellow-700 dark:text-yellow-400' :
+                          result.overallScore >= 40 ? 'bg-orange-500/20 text-orange-700 dark:text-orange-400' :
+                          'bg-red-500/20 text-red-700 dark:text-red-400'
+                        } border-0`}>
+                          {getScoreLabel(result.overallScore)}
+                        </Badge>
+                      </div>
+                      <div className="space-y-2">
+                        <Progress
+                          value={result.overallScore}
+                          className="h-3 bg-slate-200/50 dark:bg-slate-700/50"
+                        />
+                        <p className="text-xs text-muted-foreground">Based on 5 key financial metrics</p>
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
-              )}
-            </div>
-          )}
-        </div>
 
-        {/* AI Chat Sidebar */}
-        <div className="lg:sticky lg:top-6">
-          <Card className="h-full flex flex-col border-red-200/50 min-h-[600px] shadow-lg">
-            <CardHeader className="bg-red-50/50 border-b">
-              <CardTitle>DhanRaksha Consult</CardTitle>
-              <CardDescription>Chat directly with your diagnostic advisor</CardDescription>
-            </CardHeader>
-            <CardContent className="flex-1 flex flex-col p-0">
-              <div className="flex-1 overflow-y-auto p-4 space-y-4 max-h-[500px]">
-                {messages.map((msg) => (
-                  <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[85%] rounded-xl p-3 ${msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
-                      <div className="whitespace-pre-wrap text-sm leading-relaxed">{parseMarkdown(msg.content)}</div>
-                    </div>
-                  </div>
-                ))}
-                {chatLoading && (
-                  <div className="flex justify-start">
-                    <div className="bg-muted rounded-xl p-3 flex items-center gap-2">
-                      <Loader2 className="w-4 h-4 animate-spin text-primary" />
-                      <span className="text-sm text-muted-foreground">DhanRaksha is assessing risks...</span>
-                    </div>
-                  </div>
+                {/* Metrics Grid */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  {[
+                    { title: "Savings Rate", value: result.savingsRate.toFixed(1), unit: "%", icon: "📊" },
+                    { title: "Emergency Fund", value: result.emergencyMonths.toFixed(1), unit: " months", icon: "🛡️" },
+                    { title: "Debt-to-Income", value: result.debtToIncome.toFixed(1), unit: "%", icon: "💳" },
+                    { title: "Investment Ratio", value: result.investmentRatio.toFixed(1), unit: "x", icon: "📈" },
+                  ].map((metric, idx) => (
+                    <Card key={idx} className="border-slate-200/30 dark:border-slate-700/30 hover:shadow-md transition-all duration-300 overflow-hidden group">
+                      <CardContent className="p-5 space-y-3">
+                        <div className="flex items-start justify-between">
+                          <div className="space-y-1 flex-1">
+                            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{metric.title}</p>
+                            <p className="text-3xl font-bold tracking-tight">
+                              {metric.value}<span className="text-lg font-semibold text-muted-foreground">{metric.unit}</span>
+                            </p>
+                          </div>
+                          <span className="text-2xl opacity-60 group-hover:opacity-100 transition-opacity">{metric.icon}</span>
+                        </div>
+                        <Progress
+                          value={Math.min(100, parseFloat(metric.value) * 10)}
+                          className="h-2 bg-slate-200/50 dark:bg-slate-700/50"
+                        />
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+
+                {/* Recommendations Card */}
+                {result.recommendations.length > 0 && (
+                  <Card className="border-0 shadow-lg overflow-hidden bg-gradient-to-br from-red-50/50 to-orange-50/30 dark:from-red-950/20 dark:to-orange-950/10 border border-red-200/30 dark:border-red-800/30">
+                    <div className="h-1 bg-gradient-to-r from-red-500 to-orange-600" />
+                    <CardHeader>
+                      <CardTitle className="text-lg flex items-center gap-2 text-red-900 dark:text-red-400">
+                        <AlertCircle className="w-5 h-5" />
+                        Areas to Improve
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-3">
+                        {result.recommendations.map((rec: string, idx: number) => (
+                          <li key={idx} className="flex gap-3 p-3 bg-white/50 dark:bg-slate-900/30 rounded-lg border border-red-200/20 dark:border-red-800/20 group hover:bg-white dark:hover:bg-slate-900/50 transition-colors">
+                            <span className="flex-shrink-0 text-red-600 dark:text-red-400 font-bold mt-0.5">→</span>
+                            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{rec}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
                 )}
-                <div ref={messagesEndRef} />
               </div>
-              
-              <div className="p-4 border-t bg-muted/30">
-                <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} className="flex gap-2">
-                  <Input
-                    value={chatInput}
-                    onChange={(e) => setChatInput(e.target.value)}
-                    placeholder="Ask about debt avalanche vs snowball methods..."
-                    disabled={chatLoading}
-                    className="flex-1 border-red-200 focus-visible:ring-red-400"
-                  />
-                  <Button type="submit" disabled={chatLoading || !chatInput.trim()} className="bg-red-600 hover:bg-red-700 text-white">
-                    <Send className="w-4 h-4" />
-                  </Button>
-                </form>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+            )}
+          </div>
 
+          {/* Right Column - AI Chat */}
+          <div className="lg:sticky lg:top-8">
+            <Card className="border-0 shadow-xl overflow-hidden flex flex-col h-[700px] bg-white dark:bg-slate-900">
+              <div className="h-1.5 bg-gradient-to-r from-red-500 via-orange-500 to-red-600" />
+              
+              <CardHeader className="bg-gradient-to-br from-red-50/80 to-orange-50/50 dark:from-slate-950 dark:to-slate-900 border-b border-red-200/20 dark:border-red-900/30 px-6 py-5">
+                <div className="space-y-1">
+                  <CardTitle className="text-xl flex items-center gap-3">
+                    <span className="text-2xl">🩺</span>
+                    <span>DhanRaksha Consult</span>
+                  </CardTitle>
+                  <CardDescription className="text-sm">Get personalized financial wellness advice</CardDescription>
+                </div>
+              </CardHeader>
+
+              <CardContent className="flex-1 flex flex-col p-0 overflow-hidden bg-gradient-to-b from-white/80 to-slate-50/50 dark:from-slate-900/60 dark:to-slate-900">
+                {/* Messages Container */}
+                <div className="flex-1 overflow-y-auto p-5 space-y-4 max-h-[580px] scrollbar-thin scrollbar-thumb-red-300 dark:scrollbar-thumb-red-700 scrollbar-track-transparent">
+                  {messages.map((msg) => (
+                    <div
+                      key={msg.id}
+                      className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"} animate-in fade-in slide-in-from-bottom-3 duration-400`}
+                    >
+                      <div
+                        className={`max-w-xs lg:max-w-sm px-4 py-3 rounded-2xl transition-all duration-200 ${
+                          msg.role === "user"
+                            ? "bg-gradient-to-br from-red-600 to-orange-600 text-white shadow-lg hover:shadow-xl"
+                            : "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 border border-red-200/40 dark:border-red-900/40 shadow-sm"
+                        }`}
+                      >
+                        <div className="text-sm leading-relaxed whitespace-pre-wrap break-words font-medium">
+                          {parseMarkdown(msg.content)}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  {chatLoading && (
+                    <div className="flex justify-start animate-in fade-in slide-in-from-left-2 duration-300">
+                      <div className="bg-slate-100 dark:bg-slate-800 rounded-2xl px-5 py-3.5 border border-red-200/40 dark:border-red-900/40 shadow-sm flex items-center gap-3">
+                        <Loader2 className="w-4 h-4 animate-spin text-red-500 dark:text-red-400" />
+                        <span className="text-sm text-slate-700 dark:text-slate-300 font-medium">DhanRaksha is analyzing...</span>
+                      </div>
+                    </div>
+                  )}
+
+                  <div ref={messagesEndRef} />
+                </div>
+
+                {/* Input Area */}
+                <div className="border-t border-red-200/20 dark:border-red-900/30 bg-gradient-to-r from-white to-red-50/30 dark:from-slate-900 dark:to-red-950/20 p-5 space-y-3">
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault()
+                      handleSendMessage()
+                    }}
+                    className="flex gap-3 items-center"
+                  >
+                    <div className="flex-1 relative">
+                      <Input
+                        value={chatInput}
+                        onChange={(e) => setChatInput(e.target.value)}
+                        placeholder="Ask about debt, savings, health score..."
+                        disabled={chatLoading}
+                        className="border-red-200/50 dark:border-red-900/50 dark:bg-slate-800/50 focus:border-red-400 focus:ring-red-500/30 rounded-full h-11 px-5 placeholder:text-slate-500 dark:placeholder:text-slate-400 transition-all duration-200 shadow-md focus:shadow-lg"
+                      />
+                    </div>
+                    <Button
+                      type="submit"
+                      disabled={chatLoading || !chatInput.trim()}
+                      className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white rounded-full w-11 h-11 p-0 flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+                    >
+                      <Send className="w-5 h-5" />
+                    </Button>
+                  </form>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 px-2">Press Enter or click send</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     </div>
   )
