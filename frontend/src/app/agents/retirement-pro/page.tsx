@@ -65,7 +65,7 @@ export default function RetirementProPage() {
         body: JSON.stringify({
           message: query,
           user_id: userId,
-          agent_id: "yojana"
+          agent_id: "retirement-pro"
         }),
       })
 
@@ -97,7 +97,7 @@ export default function RetirementProPage() {
   const calculateFIRE = async () => {
     setCalculating(true)
     try {
-      const response = await fetch("/api/yojana", {
+      const response = await fetch("/api/retirement-pro", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

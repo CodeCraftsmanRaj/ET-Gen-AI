@@ -67,7 +67,7 @@ export default function LifeEventPage() {
         body: JSON.stringify({
           message: query,
           user_id: userId,
-          agent_id: "life-event"
+          agent_id: "life-goals"
         }),
       })
 

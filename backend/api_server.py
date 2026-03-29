@@ -12,6 +12,7 @@ import sys
 import os
 from datetime import datetime
 import logging
+from dotenv import load_dotenv
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -20,6 +21,10 @@ logger = logging.getLogger(__name__)
 # Add project to path - cross-platform compatible
 backend_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, backend_dir)
+
+# Load env vars from backend/.env and project root/.env
+load_dotenv(os.path.join(backend_dir, ".env"), override=False)
+load_dotenv(os.path.join(os.path.dirname(backend_dir), ".env"), override=False)
 
 # Import all agent modules with fallbacks
 try:

@@ -58,7 +58,7 @@ export default function CouplePlannerPage() {
         body: JSON.stringify({
           message: query,
           user_id: userId,
-          agent_id: "couple-planner"
+          agent_id: "partner-finance"
         }),
       })
 

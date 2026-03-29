@@ -11,9 +11,14 @@ import os
 import uuid
 from datetime import datetime
 from typing import Optional, List, Dict, Any
+from dotenv import load_dotenv
 
 from fastapi import HTTPException
 from pydantic import BaseModel
+
+backend_dir = os.path.dirname(os.path.abspath(__file__))
+load_dotenv(os.path.join(backend_dir, ".env"), override=False)
+load_dotenv(os.path.join(os.path.dirname(backend_dir), ".env"), override=False)
 
 # Database setup - use project's data directory
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'chat_history.db')
@@ -21,6 +26,18 @@ os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
 
 # Backend API URL
 BACKEND_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:8000")
+
+AGENT_PROMPTS = {
+    "dhan-sarthi": "You are DhanSarthi, the AI coordinator for personal finance in India. Be concise and practical.",
+    "tax-master": "You are TaxMaster, Indian tax advisor. Explain old/new regime, deductions, and legal tax optimization.",
+    "retirement-pro": "You are RetirementPro, FIRE and retirement planner. Use clear assumptions and practical SIP guidance.",
+    "stock-insight": "You are StockInsight. Provide educational market insights and include a SEBI caution.",
+    "portfolio-wise": "You are PortfolioWise. Explain mutual fund portfolio risk, diversification, and rebalancing ideas.",
+    "money-health": "You are MoneyHealth. Assess savings, debt, emergency fund, and actionable steps.",
+    "compliance-helper": "You are ComplianceHelper. Give concise compliance/regulatory guidance with disclaimers.",
+    "life-goals": "You are LifeGoals. Help users plan financial milestones with inflation-aware estimates.",
+    "partner-finance": "You are PartnerFinance. Help couples optimize joint budget, goals, and debt strategy.",
+}
 
 def init_db():
     """Initialize SQLite database for chat history"""
@@ -85,61 +102,45 @@ def send_to_agent(agent_id: str, message: str, session_id: str = None) -> str:
     
     Routes to appropriate agent endpoint based on agent_id
     """
-    try:
-        # Chat payloads are free-text. Use conversational endpoint for all agents.
-        # This avoids 422 errors from strict calculator endpoints that require structured numeric bodies.
-        endpoint = f"{BACKEND_URL}/ai/chat"
+    # NOTE: Avoid calling this same FastAPI service over HTTP from inside a request
+    # handler, which can deadlock/time out under single-worker dev mode.
+    prompt = AGENT_PROMPTS.get(agent_id, AGENT_PROMPTS["dhan-sarthi"])
 
-        # Backward-compatible agent aliases expected by /ai/chat
-        ai_agent_alias = {
-            "dhan-sarthi": "dhansarthi",
-            "tax-master": "tax-master",
-            "retirement-pro": "retirement-pro",
-            "stock-insight": "stock-insight",
-            "money-health": "money-health",
-            "compliance-helper": "compliance-helper",
-            "portfolio-wise": "portfolio-wise",
-            "life-goals": "life-goals",
-            "partner-finance": "partner-finance",
-        }.get(agent_id, "dhansarthi")
+    openai_api_key = (os.getenv("OPENAI_API_KEY", "") or "").strip().strip('"')
+    openai_model = (os.getenv("OPENAI_MODEL", "gpt-4o-mini") or "gpt-4o-mini").strip()
 
-        payload = {
-            "message": message,
-            "agent": ai_agent_alias,
-        }
-        
-        response = requests.post(
-            endpoint,
-            json=payload,
-            timeout=65
+    if not openai_api_key:
+        return (
+            f"I'm {agent_id}, ready to help. I can still provide guidance without external AI keys. "
+            f"For richer responses, set OPENAI_API_KEY in backend/.env and restart the backend."
         )
-        
-        if response.status_code >= 400:
-            return f"[Agent {agent_id} error: Status {response.status_code}]"
-        
-        # Parse the response
-        try:
-            data = response.json()
-            # Extract the response text from various possible response formats
-            if isinstance(data, dict):
-                if "response" in data:
-                    return data["response"]
-                elif "message" in data:
-                    return data["message"]
-                elif "result" in data:
-                    return str(data["result"])
-                else:
-                    return json.dumps(data, indent=2)
-            return str(data)
-        except:
-            return response.text
-        
-    except requests.Timeout:
-        return f"[Agent {agent_id} timed out after 65 seconds]"
-    except requests.ConnectionError:
-        return f"[Cannot connect to agent {agent_id} - backend offline at {BACKEND_URL}]"
+
+    try:
+        response = requests.post(
+            "https://api.openai.com/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {openai_api_key}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": openai_model,
+                "messages": [
+                    {"role": "system", "content": prompt},
+                    {"role": "user", "content": message},
+                ],
+                "max_tokens": 700,
+                "temperature": 0.7,
+            },
+            timeout=45,
+        )
+        response.raise_for_status()
+        data = response.json()
+        return data["choices"][0]["message"]["content"]
     except Exception as e:
-        return f"[Error reaching {agent_id}: {str(e)}]"
+        return (
+            f"I'm {agent_id}. I couldn't reach external AI right now ({str(e)}). "
+            f"Please retry in a moment."
+        )
 
 # FastAPI Models
 class ChatRequest(BaseModel):

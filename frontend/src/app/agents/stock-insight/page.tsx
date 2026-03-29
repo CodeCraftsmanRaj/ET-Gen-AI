@@ -53,7 +53,7 @@ export default function StockInsightPage() {
         body: JSON.stringify({
           message: query,
           user_id: userId,
-          agent_id: "bazaar"
+          agent_id: "stock-insight"
         }),
       })
 
@@ -89,7 +89,7 @@ export default function StockInsightPage() {
     setSymbol(searchTarget)
     setLoading(true)
     try {
-      const response = await fetch("/api/bazaar", {
+      const response = await fetch("/api/stock-insight", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ symbol: searchTarget.toUpperCase() }),

@@ -39,7 +39,7 @@ export default function ComplianceHelperPage() {
 
   const fetchDisclaimers = async () => {
     try {
-      const response = await fetch("/api/vidhi")
+      const response = await fetch("/api/compliance-helper")
       if (!response.ok) throw new Error("Backend error")
       const data = await response.json()
       setDisclaimers(data.disclaimers || [])
@@ -73,7 +73,7 @@ export default function ComplianceHelperPage() {
         body: JSON.stringify({
           message: query,
           user_id: userId,
-          agent_id: "vidhi"
+          agent_id: "compliance-helper"
         }),
       })
 

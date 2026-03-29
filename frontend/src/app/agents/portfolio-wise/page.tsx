@@ -85,7 +85,7 @@ export default function PortfolioWisePage() {
         body: JSON.stringify({
           message: query,
           user_id: userId,
-          agent_id: "niveshak"
+          agent_id: "portfolio-wise"
         }),
       })
 
@@ -120,7 +120,7 @@ export default function PortfolioWisePage() {
     
     setAnalyzing(true)
     try {
-      const response = await fetch("/api/niveshak", {
+      const response = await fetch("/api/portfolio-wise", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ holdings: validHoldings }),
