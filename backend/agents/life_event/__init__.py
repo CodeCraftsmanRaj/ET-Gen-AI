@@ -20,11 +20,29 @@ class LifeEventAdvisor:
     
     # Average costs in India (in INR)
     EVENT_COSTS = {
+        "bonus": {
+            "min": 50000,
+            "max": 5000000,
+            "avg": 300000,
+            "description": "Annual or one-time bonus deployment plan across emergency fund, debt prepayment, and investing"
+        },
+        "inheritance": {
+            "min": 100000,
+            "max": 50000000,
+            "avg": 2500000,
+            "description": "Inheritance allocation planning with tax-aware deployment and risk-calibrated investing"
+        },
         "marriage": {
             "min": 500000,
             "max": 5000000,
             "avg": 1500000,
             "description": "Wedding expenses including venue, catering, decorations"
+        },
+        "new_baby": {
+            "min": 100000,
+            "max": 800000,
+            "avg": 300000,
+            "description": "New baby setup costs including hospital, newborn care, and first-year expenses"
         },
         "child_birth": {
             "min": 100000,
@@ -137,6 +155,13 @@ class LifeEventAdvisor:
         expected_return: float = 0.12
     ) -> Dict[str, Any]:
         """Create comprehensive plan for a life event"""
+        aliases = {
+            "baby": "new_baby",
+            "child": "child_birth",
+            "childbirth": "child_birth",
+            "new-baby": "new_baby",
+        }
+        event_type = aliases.get(event_type, event_type)
         
         if event_type not in self.EVENT_COSTS:
             return {"error": f"Unknown event type: {event_type}"}
@@ -217,6 +242,15 @@ class LifeEventAdvisor:
         if event_type == "marriage":
             recommendations.append("Consider pre-wedding expenses separately")
             recommendations.append("Book venues early for better deals")
+        elif event_type == "bonus":
+            recommendations.append("Use a 50/30/20 split: 50% goals, 30% debt/prepay, 20% lifestyle")
+            recommendations.append("Top up emergency fund to 6 months before new risk investments")
+        elif event_type == "inheritance":
+            recommendations.append("Park funds temporarily in liquid/debt funds before phased deployment")
+            recommendations.append("Review nomination and estate documents after allocation")
+        elif event_type == "new_baby" or event_type == "child_birth":
+            recommendations.append("Increase family floater health cover and add child rider")
+            recommendations.append("Start child goal SIP immediately to reduce monthly burden later")
         elif event_type == "child_education":
             recommendations.append("Explore education loan options for higher studies")
             recommendations.append("Consider 529 equivalent savings plans")

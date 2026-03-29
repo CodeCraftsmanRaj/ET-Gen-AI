@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 import sys
 import os
+from datetime import datetime
 
 # Add project to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -56,6 +57,12 @@ class HealthRequest(BaseModel):
     monthly_investments: float = 0
     debt: float = 0
     insurance_coverage: float = 0
+    equity_allocation: float = 0
+    debt_allocation: float = 0
+    gold_allocation: float = 0
+    cash_allocation: float = 0
+    annual_tax_paid: float = 0
+    annual_tax_saved: float = 0
 
 class XIRRRequest(BaseModel):
     transactions: List[Dict[str, Any]]
@@ -148,12 +155,15 @@ async def analyze_portfolio(request: Dict[str, Any]):
         "max_drawdown": analyzer.get_risk_metrics([100, 102, 105, 104, 108, 110, 115])["max_drawdown"]
     }
     
+    xray = _build_portfolio_xray(holdings, total_value, xirr_percent)
+
     return {
         "status": "success",
         "total_value": total_value,
         "xirr_percent": xirr_percent,
         "risk_metrics": risk_metrics,
-        "holdings": holdings
+        "holdings": holdings,
+        "xray": xray
     }
 
 # ============ KARVID (Tax Wizard) ============
@@ -264,13 +274,23 @@ async def get_sip(request: Dict[str, Any]):
     return result
 
 @app.post("/yojana/retirement-plan")
-async def create_retirement_plan(request: FIRERequest):
+async def create_retirement_plan(request: Dict[str, Any]):
     """Create retirement plan"""
+    monthly_expenses = float(request.get("monthly_expenses", 50000) or 50000)
+    current_age = int(request.get("current_age", 30) or 30)
+    retirement_age = int(request.get("retirement_age", 55) or 55)
+    current_corpus = float(request.get("current_corpus", 0) or 0)
+    monthly_income = float(request.get("monthly_income", 0) or 0)
+    existing_life_cover = float(request.get("existing_life_cover", 0) or 0)
+    tax_80c_used = float(request.get("tax_80c_used", 0) or 0)
+    nps_contribution = float(request.get("nps_contribution", 0) or 0)
+    goals = request.get("goals", []) or []
+
     calc = FIRECalculator(
-        monthly_expenses=request.monthly_expenses,
-        current_age=request.current_age,
-        retirement_age=request.retirement_age,
-        current_corpus=request.current_corpus
+        monthly_expenses=monthly_expenses,
+        current_age=current_age,
+        retirement_age=retirement_age,
+        current_corpus=current_corpus
     )
     try:
         fire_number = calc.calculate_fire_number()
@@ -278,16 +298,40 @@ async def create_retirement_plan(request: FIRERequest):
         try:
             years = calc.calculate_years_to_fire(monthly_savings)
         except Exception:
-            years = request.retirement_age - request.current_age
+            years = retirement_age - current_age
+
+        annual_income = monthly_income * 12
+        insurance_target = annual_income * 15 if annual_income > 0 else monthly_expenses * 12 * 10
+        insurance_gap = max(0, insurance_target - existing_life_cover)
+
+        goal_sip_allocation = calc.calculate_goal_based_sip(goals, max(1, years)) if goals else {"total_monthly_sip": 0, "goals": []}
+        month_by_month_roadmap = _build_fire_monthly_roadmap(
+            monthly_expenses=monthly_expenses,
+            current_age=current_age,
+            current_corpus=current_corpus,
+            monthly_sip=monthly_savings,
+            expected_return=calc.expected_return,
+            months=max(12, min(600, years * 12)),
+        )
+        emergency_fund_target = round(monthly_expenses * 6, 2)
+        tax_saving_moves = _build_tax_saving_moves(annual_income, tax_80c_used, nps_contribution)
+        asset_allocation_glide_path = _build_asset_allocation_glide_path(max(1, years))
+
         plan = {
             "fire_number": fire_number,
             "years_to_fire": years,
-            "monthly_savings": monthly_savings
+            "monthly_savings": monthly_savings,
+            "month_by_month_roadmap": month_by_month_roadmap,
+            "goal_sip_allocation": goal_sip_allocation,
+            "asset_allocation_glide_path": asset_allocation_glide_path,
+            "insurance_gap": round(insurance_gap, 2),
+            "tax_saving_moves": tax_saving_moves,
+            "emergency_fund_target": emergency_fund_target,
         }
     except Exception as e:
         plan = {
-            "fire_number": request.monthly_expenses * 12 * 25,
-            "years_to_fire": request.retirement_age - request.current_age,
+            "fire_number": monthly_expenses * 12 * 25,
+            "years_to_fire": retirement_age - current_age,
             "monthly_savings": 0,
             "note": f"Simplified calculation: {str(e)}"
         }
@@ -319,12 +363,16 @@ async def get_nifty50():
 @app.post("/dhan/health-score")
 async def calculate_health_score(request: HealthRequest):
     """Calculate financial health score"""
+    payload = request.model_dump()
     result = get_health_score(
         monthly_income=request.income,
         monthly_expenses=request.expenses,
+        monthly_emi=request.debt,
+        life_insurance_cover=request.insurance_coverage,
         monthly_savings=request.monthly_savings,
         monthly_investments=request.monthly_investments
     )
+    result["six_dimension_scorecard"] = _summarize_health_six_dimensions(result, payload)
     return result
 
 # ============ VIDHI (Compliance) ============
@@ -691,10 +739,205 @@ async def life_event_comprehensive(request: Dict[str, Any]):
 from agents.couple_planner import (
     create_couple_plan,
     calculate_expense_split,
+    optimize_couple_tax_and_protection,
     CouplePlanner,
     Person,
     SplitType
 )
+
+
+def _build_fire_monthly_roadmap(
+    monthly_expenses: float,
+    current_age: int,
+    current_corpus: float,
+    monthly_sip: float,
+    expected_return: float,
+    months: int,
+) -> List[Dict[str, Any]]:
+    """Generate month-by-month corpus projection."""
+    roadmap: List[Dict[str, Any]] = []
+    corpus = current_corpus
+    monthly_rate = expected_return / 12
+
+    for m in range(1, max(1, months) + 1):
+        corpus = corpus * (1 + monthly_rate) + monthly_sip
+        roadmap.append({
+            "month": m,
+            "age": round(current_age + (m / 12), 2),
+            "projected_corpus": round(corpus, 2),
+            "monthly_sip": round(monthly_sip, 2),
+            "inflation_adjusted_monthly_expense": round(monthly_expenses * ((1 + 0.06) ** (m / 12)), 2),
+        })
+
+    return roadmap
+
+
+def _build_asset_allocation_glide_path(years_to_fire: int) -> List[Dict[str, Any]]:
+    """Simple glide path: reduce equity near FIRE date."""
+    glide = []
+    for y in range(0, max(1, years_to_fire) + 1):
+        equity = max(40, min(80, 80 - (y * 2)))
+        debt = 100 - equity
+        glide.append({"year": y, "equity_percent": equity, "debt_percent": debt})
+    return glide
+
+
+def _build_tax_saving_moves(annual_income: float, tax_80c_used: float, nps_contribution: float) -> List[Dict[str, Any]]:
+    """Create tax-saving actions ranked by immediate utility and liquidity."""
+    remaining_80c = max(0, 150000 - tax_80c_used)
+    remaining_nps = max(0, 50000 - nps_contribution)
+    effective_rate = 0.30 if annual_income >= 1500000 else (0.20 if annual_income >= 800000 else 0.10)
+
+    moves = [
+        {
+            "name": "Use remaining 80C room (ELSS/PPF/EPF)",
+            "amount_room": round(remaining_80c, 2),
+            "estimated_tax_benefit": round(remaining_80c * effective_rate, 2),
+            "liquidity": "medium",
+            "risk": "low_to_medium",
+        },
+        {
+            "name": "Top up NPS under 80CCD(1B)",
+            "amount_room": round(remaining_nps, 2),
+            "estimated_tax_benefit": round(remaining_nps * effective_rate, 2),
+            "liquidity": "low",
+            "risk": "low",
+        },
+    ]
+    return moves
+
+
+def _summarize_health_six_dimensions(raw_result: Dict[str, Any], request_data: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
+    """Map health report into hackathon 6-dimension scorecard."""
+    metrics = {m.get("category", ""): m for m in raw_result.get("metrics", [])}
+
+    debt_metric = metrics.get("Debt to Income", {})
+    emergency_metric = metrics.get("Emergency Fund", {})
+    insurance_metric = metrics.get("Insurance Coverage", {})
+    retirement_metric = metrics.get("Retirement Readiness", {})
+
+    equity = float(request_data.get("equity_allocation", 0) or 0)
+    debt = float(request_data.get("debt_allocation", 0) or 0)
+    gold = float(request_data.get("gold_allocation", 0) or 0)
+    cash = float(request_data.get("cash_allocation", 0) or 0)
+    allocation_total = equity + debt + gold + cash
+    diversification_score = 45.0
+    if allocation_total > 0:
+        weights = [equity / allocation_total, debt / allocation_total, gold / allocation_total, cash / allocation_total]
+        concentration = max(weights)
+        diversification_score = round(max(0, min(100, (1 - concentration) * 133.33)), 1)
+
+    annual_income = float(request_data.get("income", 0) or 0) * 12
+    annual_tax_paid = float(request_data.get("annual_tax_paid", 0) or 0)
+    annual_tax_saved = float(request_data.get("annual_tax_saved", 0) or 0)
+    tax_efficiency_score = 50.0
+    if annual_income > 0:
+        tax_ratio = annual_tax_paid / annual_income
+        bonus = min(15, annual_tax_saved / max(1, annual_income) * 1000)
+        tax_efficiency_score = round(max(0, min(100, 85 - (tax_ratio * 220) + bonus)), 1)
+
+    return {
+        "emergency_preparedness": {
+            "score": emergency_metric.get("score", 0),
+            "status": emergency_metric.get("status", "unknown"),
+        },
+        "insurance_coverage": {
+            "score": insurance_metric.get("score", 0),
+            "status": insurance_metric.get("status", "unknown"),
+        },
+        "investment_diversification": {
+            "score": diversification_score,
+            "status": "good" if diversification_score >= 60 else "needs_improvement",
+        },
+        "debt_health": {
+            "score": debt_metric.get("score", 0),
+            "status": debt_metric.get("status", "unknown"),
+        },
+        "tax_efficiency": {
+            "score": tax_efficiency_score,
+            "status": "good" if tax_efficiency_score >= 60 else "needs_improvement",
+        },
+        "retirement_readiness": {
+            "score": retirement_metric.get("score", 0),
+            "status": retirement_metric.get("status", "unknown"),
+        },
+    }
+
+
+def _extract_category_from_name(name: str) -> str:
+    lowered = (name or "").lower()
+    if "small cap" in lowered or "smallcap" in lowered:
+        return "Small Cap"
+    if "mid cap" in lowered or "midcap" in lowered:
+        return "Mid Cap"
+    if "large cap" in lowered or "largecap" in lowered or "bluechip" in lowered:
+        return "Large Cap"
+    if "index" in lowered or "nifty" in lowered or "sensex" in lowered:
+        return "Index"
+    if "debt" in lowered or "bond" in lowered or "gilt" in lowered or "liquid" in lowered:
+        return "Debt"
+    if "flexi" in lowered or "multicap" in lowered:
+        return "Flexi/Multi Cap"
+    return "Other"
+
+
+def _build_portfolio_xray(holdings: List[Dict[str, Any]], total_value: float, xirr_percent: float) -> Dict[str, Any]:
+    """Build overlap, expense drag, benchmark comparison and rebalance ideas."""
+    if total_value <= 0:
+        return {
+            "overlap_analysis": {},
+            "expense_ratio_drag": {},
+            "benchmark_comparison": {},
+            "rebalancing_plan": [],
+        }
+
+    category_weights: Dict[str, float] = {}
+    weighted_expense_ratio = 0.0
+
+    for h in holdings:
+        name = h.get("name", "")
+        value = float(h.get("units", 0) or 0) * float(h.get("nav", 0) or 0)
+        if value <= 0:
+            continue
+        weight = value / total_value
+        category = _extract_category_from_name(name)
+        category_weights[category] = category_weights.get(category, 0) + weight
+
+        expense_ratio = float(h.get("expenseRatio", 1.0) or 1.0)
+        weighted_expense_ratio += (expense_ratio * weight)
+
+    overlap_score = round(min(100, max(category_weights.values(), default=0) * 100), 1)
+    annual_drag_rupees = round(total_value * (weighted_expense_ratio / 100), 2)
+
+    benchmark = 12.0
+    alpha = round(xirr_percent - benchmark, 2)
+
+    rebalancing_plan = []
+    for cat, wt in category_weights.items():
+        if wt > 0.45:
+            rebalancing_plan.append(
+                f"Reduce {cat} exposure from {round(wt * 100, 1)}% toward 35-40% to lower concentration risk."
+            )
+    if not rebalancing_plan:
+        rebalancing_plan.append("Current allocation appears reasonably diversified across categories.")
+
+    return {
+        "overlap_analysis": {
+            "category_weights_percent": {k: round(v * 100, 1) for k, v in category_weights.items()},
+            "overlap_risk_score": overlap_score,
+        },
+        "expense_ratio_drag": {
+            "weighted_expense_ratio_percent": round(weighted_expense_ratio, 2),
+            "estimated_annual_drag_rupees": annual_drag_rupees,
+        },
+        "benchmark_comparison": {
+            "portfolio_xirr_percent": round(xirr_percent, 2),
+            "benchmark_name": "Nifty 50 TRI (proxy)",
+            "benchmark_return_percent": benchmark,
+            "alpha_percent": alpha,
+        },
+        "rebalancing_plan": rebalancing_plan,
+    }
 
 @app.post("/couple/finances")
 async def couple_get_finances(request: Dict[str, Any]):
@@ -799,6 +1042,30 @@ async def couple_debt_payoff(request: Dict[str, Any]):
             "note": f"Debt payoff calculation error: {str(e)}",
             "recommendation": "Please provide expenses and savings for both partners for accurate planning."
         }
+
+
+@app.post("/couple/optimize")
+async def couple_optimize(request: Dict[str, Any]):
+    """Optimize couple plan across HRA, NPS, SIP split, insurance, and net worth."""
+    return optimize_couple_tax_and_protection(
+        person1_name=request.get("person1_name", "Person 1"),
+        person1_income=request.get("person1_income", 0),
+        person2_name=request.get("person2_name", "Person 2"),
+        person2_income=request.get("person2_income", 0),
+        person1_expenses=request.get("person1_expenses", 0),
+        person2_expenses=request.get("person2_expenses", 0),
+        person1_savings=request.get("person1_savings", 0),
+        person2_savings=request.get("person2_savings", 0),
+        rent_paid_annual=request.get("rent_paid_annual", 0),
+        hra_received_person1=request.get("hra_received_person1", 0),
+        hra_received_person2=request.get("hra_received_person2", 0),
+        nps_person1=request.get("nps_person1", 0),
+        nps_person2=request.get("nps_person2", 0),
+        current_life_cover_person1=request.get("current_life_cover_person1", 0),
+        current_life_cover_person2=request.get("current_life_cover_person2", 0),
+        goals=request.get("goals", []),
+        expected_return=request.get("expected_return", 0.12),
+    )
 
 # ============ MAIN ============
 if __name__ == "__main__":

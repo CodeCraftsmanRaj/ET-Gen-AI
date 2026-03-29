@@ -380,6 +380,94 @@ class CouplePlanner:
             ]
         }
 
+    def optimize_joint_tax_and_protection(
+        self,
+        rent_paid_annual: float = 0,
+        hra_received_person1: float = 0,
+        hra_received_person2: float = 0,
+        nps_person1: float = 0,
+        nps_person2: float = 0,
+        current_life_cover_person1: float = 0,
+        current_life_cover_person2: float = 0,
+        expected_return: float = 0.12,
+        goals: Optional[List[Dict[str, Any]]] = None,
+    ) -> Dict[str, Any]:
+        """Optimize HRA/NPS/SIP split and insurance ownership at couple level."""
+        total_income = max(1.0, self.person1.income + self.person2.income)
+
+        p1_ratio = self.person1.income / total_income
+        p2_ratio = self.person2.income / total_income
+
+        hra_split = {
+            self.person1.name: round(rent_paid_annual * p1_ratio, 2),
+            self.person2.name: round(rent_paid_annual * p2_ratio, 2),
+        }
+        hra_claim_recommendation = {
+            self.person1.name: round(min(hra_received_person1, hra_split[self.person1.name]), 2),
+            self.person2.name: round(min(hra_received_person2, hra_split[self.person2.name]), 2),
+        }
+
+        nps_room = {
+            self.person1.name: round(max(0, 50000 - nps_person1), 2),
+            self.person2.name: round(max(0, 50000 - nps_person2), 2),
+        }
+
+        insurance_target_p1 = self.person1.income * 12 * 12
+        insurance_target_p2 = self.person2.income * 12 * 12
+        insurance_gap = {
+            self.person1.name: round(max(0, insurance_target_p1 - current_life_cover_person1), 2),
+            self.person2.name: round(max(0, insurance_target_p2 - current_life_cover_person2), 2),
+        }
+
+        couple_emergency_fund_target = round((self.person1.expenses + self.person2.expenses) * 6, 2)
+
+        sip_split = {}
+        monthly_goal_sip = 0.0
+        if goals:
+            for goal in goals:
+                target_amount = float(goal.get("target_amount", 0) or 0)
+                years = int(goal.get("years", 1) or 1)
+                months = max(1, years * 12)
+                monthly_rate = expected_return / 12
+                if monthly_rate > 0:
+                    sip = target_amount * monthly_rate / ((1 + monthly_rate) ** months - 1)
+                else:
+                    sip = target_amount / months
+                monthly_goal_sip += sip
+
+            sip_split = {
+                self.person1.name: round(monthly_goal_sip * p1_ratio, 2),
+                self.person2.name: round(monthly_goal_sip * p2_ratio, 2),
+            }
+
+        return {
+            "income_ratio": {
+                self.person1.name: round(p1_ratio, 3),
+                self.person2.name: round(p2_ratio, 3),
+            },
+            "hra": {
+                "rent_paid_annual": round(rent_paid_annual, 2),
+                "suggested_claim_split": hra_claim_recommendation,
+            },
+            "nps": {
+                "current_contribution": {
+                    self.person1.name: round(nps_person1, 2),
+                    self.person2.name: round(nps_person2, 2),
+                },
+                "additional_80ccd1b_room": nps_room,
+            },
+            "goal_sip_split": {
+                "combined_monthly_sip": round(monthly_goal_sip, 2),
+                "split": sip_split,
+            },
+            "insurance": {
+                "individual_life_cover_gap": insurance_gap,
+                "joint_vs_individual_note": "Keep term insurance individual; use family floater for health insurance.",
+            },
+            "combined_net_worth": self.get_combined_finances().get("net_worth", 0),
+            "emergency_fund_target": couple_emergency_fund_target,
+        }
+
 
 # Convenience functions for API
 def create_couple_plan(
@@ -429,3 +517,37 @@ def calculate_expense_split(
     split_enum = SplitType(split_type)
     
     return planner.suggest_expense_split(expense_amount, split_enum)
+
+
+def optimize_couple_tax_and_protection(
+    person1_name: str,
+    person1_income: float,
+    person2_name: str,
+    person2_income: float,
+    **kwargs,
+) -> Dict[str, Any]:
+    """Convenience wrapper for couple-level tax + insurance optimization."""
+    p1 = Person(
+        name=person1_name,
+        income=person1_income,
+        expenses=kwargs.get("person1_expenses", 0),
+        savings=kwargs.get("person1_savings", 0),
+    )
+    p2 = Person(
+        name=person2_name,
+        income=person2_income,
+        expenses=kwargs.get("person2_expenses", 0),
+        savings=kwargs.get("person2_savings", 0),
+    )
+    planner = CouplePlanner(p1, p2)
+    return planner.optimize_joint_tax_and_protection(
+        rent_paid_annual=kwargs.get("rent_paid_annual", 0),
+        hra_received_person1=kwargs.get("hra_received_person1", 0),
+        hra_received_person2=kwargs.get("hra_received_person2", 0),
+        nps_person1=kwargs.get("nps_person1", 0),
+        nps_person2=kwargs.get("nps_person2", 0),
+        current_life_cover_person1=kwargs.get("current_life_cover_person1", 0),
+        current_life_cover_person2=kwargs.get("current_life_cover_person2", 0),
+        expected_return=kwargs.get("expected_return", 0.12),
+        goals=kwargs.get("goals"),
+    )
