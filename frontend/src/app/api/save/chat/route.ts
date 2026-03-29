@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     const chatMessage = await prisma.chatMessage.create({
       data: {
         userId,
-        agentType: agentType || 'dhan-sarthi',
+        agentType: agentType || 'coordinator',
         query: query || '',
         response: response || '',
       },

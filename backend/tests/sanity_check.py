@@ -76,33 +76,33 @@ def t_login_nonexistent():
     return r.status_code == 404, f"Status {r.status_code}"
 test("Auth", "EDGE: login nonexistent → 404", t_login_nonexistent)
 
-# ════════════════════════ SECTION 2: DHANSARTHI ROUTING ════════════════════════
+# ════════════════════════ SECTION 2: COORDINATOR ROUTING ════════════════════════
 print("\n" + "=" * 60)
-print("  2. DHANSARTHI ROUTING")
+print("  2. COORDINATOR ROUTING")
 print("=" * 60)
 
 def route(query, context=None):
     payload = {"query": query}
     if context:
         payload["context"] = context
-    r = requests.post(f"{API}/dhan-sarthi/route", json=payload, timeout=10)
+    r = requests.post(f"{API}/coordinator/route", json=payload, timeout=10)
     return r.json()
 
 def t_greeting():
     d = route("hello")
-    return d.get("primary_agent") == "dhan-sarthi" and d.get("intent") == "greeting", f"agent={d.get('primary_agent')}, intent={d.get('intent')}"
-test("Routing", "Greeting: hello → dhan-sarthi", t_greeting)
+    return d.get("primary_agent") == "coordinator" and d.get("intent") == "greeting", f"agent={d.get('primary_agent')}, intent={d.get('intent')}"
+test("Routing", "Greeting: hello → coordinator", t_greeting)
 
 def t_namaste():
     d = route("namaste")
-    return d.get("primary_agent") == "dhan-sarthi", f"agent={d.get('primary_agent')}"
-test("Routing", "Greeting: namaste → dhan-sarthi", t_namaste)
+    return d.get("primary_agent") == "coordinator", f"agent={d.get('primary_agent')}"
+test("Routing", "Greeting: namaste → coordinator", t_namaste)
 
 def t_help():
     d = route("help me")
     # Help may be classified as 'help' or routed; accept both
-    return d.get("primary_agent") == "dhan-sarthi", f"intent={d.get('intent')}, agent={d.get('primary_agent')}"
-test("Routing", "Help request → dhan-sarthi", t_help)
+    return d.get("primary_agent") == "coordinator", f"intent={d.get('intent')}, agent={d.get('primary_agent')}"
+test("Routing", "Help request → coordinator", t_help)
 
 def t_thanks():
     d = route("thank you")
@@ -111,7 +111,7 @@ test("Routing", "Thanks handled", t_thanks)
 
 def t_explain():
     d = route("what can you do")
-    return d.get("primary_agent") == "dhan-sarthi", f"agent={d.get('primary_agent')}"
+    return d.get("primary_agent") == "coordinator", f"agent={d.get('primary_agent')}"
 test("Routing", "Explain handled", t_explain)
 
 def t_route_tax():
@@ -367,8 +367,8 @@ print("=" * 60)
 
 def t_empty_query():
     d = route("")
-    return d.get("primary_agent") == "dhan-sarthi", f"agent={d.get('primary_agent')}"
-test("Edge", "Empty query → dhan-sarthi", t_empty_query)
+    return d.get("primary_agent") == "coordinator", f"agent={d.get('primary_agent')}"
+test("Edge", "Empty query → coordinator", t_empty_query)
 
 def t_long_query():
     d = route("I need help with " + "lots of financial planning " * 50)
@@ -410,7 +410,7 @@ def t_chat_save2():
 test("Persist", "Chat save (yojana)", t_chat_save2)
 
 def t_chat_save3():
-    r = requests.post(f"{FRONTEND}/api/save/chat", json={"userId": user_id, "agentType": "dhan-sarthi", "query": "hello again", "response": "Namaste!"}, timeout=10)
+    r = requests.post(f"{FRONTEND}/api/save/chat", json={"userId": user_id, "agentType": "coordinator", "query": "hello again", "response": "Namaste!"}, timeout=10)
     return r.status_code == 201, f"Saved msg 3"
 test("Persist", "Chat save (greeting)", t_chat_save3)
 

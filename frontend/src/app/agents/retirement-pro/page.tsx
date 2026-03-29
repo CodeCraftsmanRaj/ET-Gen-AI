@@ -174,11 +174,11 @@ export default function RetirementProPage() {
     <div className="container mx-auto p-6">
       <div className="mb-8">
         <h1 className="text-3xl font-bold flex items-center gap-3">
-          🎯 YojanaKarta
+          🎯 RetirementPro
           <Badge className="bg-orange-500 hover:bg-orange-600 text-white border-0">AI Agent Active</Badge>
         </h1>
         <p className="text-muted-foreground mt-2">
-          FIRE Planner Agent. Design your path to early retirement with OpenClaw AI.
+          FIRE Planner Agent. Design your path to early retirement with practical AI guidance.
         </p>
       </div>
 
@@ -280,7 +280,7 @@ export default function RetirementProPage() {
         <div className="lg:sticky lg:top-6">
           <Card className="h-full flex flex-col border-orange-200/50 min-h-[600px] shadow-lg">
             <CardHeader className="bg-orange-50/50 border-b">
-              <CardTitle>Yojana Consult</CardTitle>
+              <CardTitle>RetirementPro Consult</CardTitle>
               <CardDescription>Chat directly with your FIRE advisor</CardDescription>
             </CardHeader>
             <CardContent className="flex-1 flex flex-col p-0">
@@ -296,7 +296,7 @@ export default function RetirementProPage() {
                   <div className="flex justify-start">
                     <div className="bg-muted rounded-xl p-3 flex items-center gap-2">
                       <Loader2 className="w-4 h-4 animate-spin text-primary" />
-                      <span className="text-sm text-muted-foreground">Yojana is modeling portfolios...</span>
+                      <span className="text-sm text-muted-foreground">RetirementPro is modeling your plan...</span>
                     </div>
                   </div>
                 )}

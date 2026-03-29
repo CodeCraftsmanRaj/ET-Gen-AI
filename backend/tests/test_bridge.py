@@ -10,7 +10,7 @@ print("=== Testing Bridge Chat Endpoint ===")
 payload = {
     "message": "Hello, what can you help me with?",
     "user_id": "test-user",
-    "agent_id": "dhan-sarthi"
+    "agent_id": "coordinator"
 }
 
 print(f"POST {BASE}/bridge/chat")
@@ -34,7 +34,7 @@ try:
         payload2 = {
             "message": "Calculate tax for 15 lakhs income",
             "user_id": "test-user",
-            "agent_id": "dhan-sarthi",
+            "agent_id": "coordinator",
             "session_id": data.get('session_id')
         }
         r2 = requests.post(f"{BASE}/bridge/chat", json=payload2, timeout=120)

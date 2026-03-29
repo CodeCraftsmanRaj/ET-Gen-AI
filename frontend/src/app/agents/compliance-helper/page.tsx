@@ -107,7 +107,7 @@ export default function ComplianceHelperPage() {
       <div className="flex items-center gap-3">
         <span className="text-4xl">⚖️</span>
         <div>
-          <h1 className="text-3xl font-bold">Vidhi</h1>
+          <h1 className="text-3xl font-bold">ComplianceHelper</h1>
           <p className="text-muted-foreground">Compliance & Legal AI Agent</p>
         </div>
       </div>
@@ -156,7 +156,7 @@ export default function ComplianceHelperPage() {
           <Card className="h-full flex flex-col border-purple-200/50">
             <CardHeader className="bg-purple-50/50 border-b">
               <CardTitle className="flex justify-between items-center">
-                <span>Ask Vidhi</span>
+                <span>Ask ComplianceHelper</span>
                 <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">AI Active</Badge>
               </CardTitle>
               <CardDescription>Get instant answers about finance laws, taxes, and SEBI regulations.</CardDescription>
@@ -174,7 +174,7 @@ export default function ComplianceHelperPage() {
                   <div className="flex justify-start">
                     <div className="bg-muted rounded-xl p-3 flex items-center gap-2">
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span className="text-sm">Vidhi is analyzing regulations...</span>
+                      <span className="text-sm">ComplianceHelper is analyzing regulations...</span>
                     </div>
                   </div>
                 )}

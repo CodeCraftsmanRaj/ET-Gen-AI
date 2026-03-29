@@ -117,7 +117,7 @@ test("Chat message saved to Prisma", test_chat_save)
 def test_chat_save_multiple():
     msgs = [
         {"agentType": "yojana", "query": "What is FIRE?", "response": "FIRE = Financial Independence, Retire Early"},
-        {"agentType": "dhan-sarthi", "query": "Hello", "response": "Namaste! I'm DhanSarthi."},
+        {"agentType": "coordinator", "query": "Hello", "response": "Namaste! I'm Coordinator."},
         {"agentType": "bazaar", "query": "RELIANCE price", "response": "RELIANCE: Rs.1414"},
     ]
     saved = 0
@@ -228,8 +228,8 @@ test("4th session login sees previous chat history", test_session_context)
 
 def test_context_to_agents():
     """Check: is chat context actually passed to backend agents?"""
-    # The DhanSarthi route endpoint - does it receive any context?
-    r = requests.post("http://localhost:8000/dhan-sarthi/route", json={
+    # The Coordinator route endpoint - does it receive any context?
+    r = requests.post("http://localhost:8000/coordinator/route", json={
         "query": "Calculate tax for 15 lakhs"
     }, timeout=10)
     data = r.json()
@@ -265,4 +265,4 @@ print("    ❌ GAP: Backend agents don't receive user context/chat history")
 print("    ❌ GAP: No Portfolio save endpoint")
 print("    ❌ GAP: No Tax/FIRE/Health load (GET) endpoints")
 print("    ❌ GAP: Frontend agent pages don't save results to DB")
-print("    ❌ GAP: DhanSarthi doesn't pass user history for contextual responses")
+print("    ❌ GAP: Coordinator doesn't pass user history for contextual responses")

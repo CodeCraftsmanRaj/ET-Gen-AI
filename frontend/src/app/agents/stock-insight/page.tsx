@@ -68,7 +68,7 @@ export default function StockInsightPage() {
         setMessages(prev => [...prev, {
           id: String(Date.now() + 1),
           role: "assistant",
-          content: "Sorry, the Bazaar agent is offline."
+          content: "Sorry, the StockInsight agent is offline."
         }])
       }
     } catch (e) {
@@ -150,7 +150,7 @@ export default function StockInsightPage() {
             </div>
             <div className="flex-1">
               <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">
-                BazaarGuru
+                StockInsight
               </h1>
               <p className="text-muted-foreground mt-1">Real-time Stock Analysis & AI-Powered Fundamental Review</p>
             </div>
@@ -301,7 +301,7 @@ export default function StockInsightPage() {
                 <div className="space-y-1">
                   <CardTitle className="text-xl flex items-center gap-3">
                     <span className="text-2xl">🧠</span>
-                    <span>Bazaar Consult</span>
+                    <span>StockInsight Consult</span>
                   </CardTitle>
                   <CardDescription className="text-sm">Real-time stock analysis from your AI analyst</CardDescription>
                 </div>

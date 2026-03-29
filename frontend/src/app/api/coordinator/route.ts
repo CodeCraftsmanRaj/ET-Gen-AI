@@ -6,7 +6,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
 
-    const response = await fetch(`${BACKEND_URL}/dhan-sarthi/route`, {
+    const response = await fetch(`${BACKEND_URL}/coordinator/route`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),

@@ -79,7 +79,7 @@ export default function MoneyHealthPage() {
         setMessages(prev => [...prev, {
           id: String(Date.now() + 1),
           role: "assistant",
-          content: "Sorry, the DhanRaksha agent is offline."
+          content: "Sorry, the MoneyHealth agent is offline."
         }])
       }
     } catch (e) {
@@ -206,7 +206,7 @@ export default function MoneyHealthPage() {
             </div>
             <div className="flex-1">
               <h1 className="text-4xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
-                DhanRaksha
+                MoneyHealth
               </h1>
               <p className="text-muted-foreground mt-1">Financial Health Diagnostic & Wellness Score</p>
             </div>
@@ -376,7 +376,7 @@ export default function MoneyHealthPage() {
                 <div className="space-y-1">
                   <CardTitle className="text-xl flex items-center gap-3">
                     <span className="text-2xl">🩺</span>
-                    <span>DhanRaksha Consult</span>
+                    <span>MoneyHealth Consult</span>
                   </CardTitle>
                   <CardDescription className="text-sm">Get personalized financial wellness advice</CardDescription>
                 </div>
@@ -408,7 +408,7 @@ export default function MoneyHealthPage() {
                     <div className="flex justify-start animate-in fade-in slide-in-from-left-2 duration-300">
                       <div className="bg-slate-100 dark:bg-slate-800 rounded-2xl px-5 py-3.5 border border-red-200/40 dark:border-red-900/40 shadow-sm flex items-center gap-3">
                         <Loader2 className="w-4 h-4 animate-spin text-red-500 dark:text-red-400" />
-                        <span className="text-sm text-slate-700 dark:text-slate-300 font-medium">DhanRaksha is analyzing...</span>
+                        <span className="text-sm text-slate-700 dark:text-slate-300 font-medium">MoneyHealth is analyzing...</span>
                       </div>
                     </div>
                   )}

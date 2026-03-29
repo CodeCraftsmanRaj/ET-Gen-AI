@@ -66,7 +66,7 @@ class APITester:
                     "stock-insight",
                     "money-health",
                     "compliance-helper",
-                    "dhan-sarthi",
+                    "coordinator",
                     "life-goals",
                     "partner-finance"
                 ]
@@ -279,11 +279,11 @@ class APITester:
             self.results["failed"] += 1
             return False
     
-    def test_dhan_sarthi_coordinator(self) -> bool:
-        """Test dhan-sarthi coordinator routing"""
+    def test_coordinator_routing(self) -> bool:
+        """Test coordinator routing"""
         try:
             response = requests.post(
-                f"{self.base_url}/dhan-sarthi/route",
+                f"{self.base_url}/coordinator/route",
                 json={"query": "How do I save taxes?"},
                 timeout=TIMEOUT
             )
@@ -291,15 +291,15 @@ class APITester:
             if response.status_code == 200:
                 data = response.json()
                 if "primary_agent" in data or "agents" in data:
-                    self.print_test("dhan-sarthi (Coordinator)", "PASS")
+                    self.print_test("coordinator", "PASS")
                     self.results["passed"] += 1
                     return True
             
-            self.print_test("dhan-sarthi", "FAIL", f"Status {response.status_code}")
+            self.print_test("coordinator", "FAIL", f"Status {response.status_code}")
             self.results["failed"] += 1
             return False
         except Exception as e:
-            self.print_test("dhan-sarthi", "FAIL", str(e))
+            self.print_test("coordinator", "FAIL", str(e))
             self.results["failed"] += 1
             return False
     
@@ -357,7 +357,7 @@ def main():
     tester.test_compliance_helper_endpoint()
     tester.test_life_goals_endpoint()
     tester.test_partner_finance_endpoint()
-    tester.test_dhan_sarthi_coordinator()
+    tester.test_coordinator_routing()
     
     # Print summary
     success = tester.print_summary()

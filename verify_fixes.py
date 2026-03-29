@@ -61,7 +61,7 @@ def test_agent_imports():
         "agents.stock_insight",
         "agents.compliance_helper",
         "agents.portfolio_wise",
-        "agents.dhan_sarthi",
+        "agents.coordinator",
     ]
     
     os.chdir("backend")

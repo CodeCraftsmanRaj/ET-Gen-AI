@@ -1,5 +1,5 @@
 """
-AI Chat Endpoint for DhanSarthi
+AI Chat Endpoint for Coordinator
 Uses OpenAI GPT-4o-mini for intelligent responses
 """
 
@@ -20,7 +20,7 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
 AGENT_PROMPTS = {
-    "dhansarthi": """You are DhanSarthi, the intelligent coordinator of AI Money Mentor - a financial assistant for Indian investors.
+    "coordinator": """You are Coordinator, the intelligent router of AI Money Mentor - a financial assistant for Indian investors.
 
 You help users with:
 - Tax planning (old vs new regime, 80C, 80D, capital gains)
@@ -101,7 +101,7 @@ Always include SEBI disclaimer when suggesting investments.""",
 
 class AIRequest(BaseModel):
     message: str
-    agent: str = "dhansarthi"
+    agent: str = "coordinator"
     context: Optional[Dict[str, Any]] = None
 
 
@@ -121,7 +121,7 @@ def get_ai_response(agent: str, user_message: str, context: Optional[str] = None
         "Content-Type": "application/json"
     }
     
-    prompt = AGENT_PROMPTS.get(agent, AGENT_PROMPTS["dhansarthi"])
+    prompt = AGENT_PROMPTS.get(agent, AGENT_PROMPTS["coordinator"])
     
     messages = [
         {"role": "system", "content": prompt},
@@ -154,7 +154,7 @@ def get_ai_response(agent: str, user_message: str, context: Optional[str] = None
 @router.post("/ai/chat", response_model=AIResponse)
 async def ai_chat(request: AIRequest):
     """Get AI-powered conversational response"""
-    agent = request.agent or "dhansarthi"
+    agent = request.agent or "coordinator"
     message = request.message
     
     # Get calculation result from context if provided

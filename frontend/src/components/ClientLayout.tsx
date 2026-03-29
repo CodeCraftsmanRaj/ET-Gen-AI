@@ -3,57 +3,27 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Moon, Sun, User, LogOut, Menu, X } from "lucide-react"
-import { toast, Toaster } from "sonner"
+import { Menu, X } from "lucide-react"
+import { Toaster } from "sonner"
 
 export default function ClientLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const [user, setUser] = useState<any>(null)
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [theme, setTheme] = useState<"light" | "dark">("light")
   const [mounted, setMounted] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user")
-    const storedLoggedIn = localStorage.getItem("isLoggedIn")
-    const storedTheme = localStorage.getItem("theme") as "light" | "dark" | null
-
-    if (storedUser) setUser(JSON.parse(storedUser))
-    if (storedLoggedIn === "true") setIsLoggedIn(true)
-    if (storedTheme) setTheme(storedTheme)
     setMounted(true)
   }, [])
-
-  useEffect(() => {
-    if (mounted) {
-      document.documentElement.classList.toggle("dark", theme === "dark")
-      localStorage.setItem("theme", theme)
-    }
-  }, [theme, mounted])
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10)
     window.addEventListener("scroll", handleScroll, { passive: true })
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
-
-  const handleLogout = () => {
-    localStorage.removeItem("user")
-    localStorage.removeItem("isLoggedIn")
-    setUser(null)
-    setIsLoggedIn(false)
-    toast.success("Logged out successfully")
-    window.location.href = "/"
-  }
-
-  const toggleTheme = () => {
-    setTheme(theme === "light" ? "dark" : "light")
-  }
 
   if (!mounted) return null
 
@@ -74,64 +44,12 @@ export default function ClientLayout({
 
           {/* Desktop Nav */}
           <div className="hidden sm:flex items-center gap-3">
-            <Link
-              href="/agents"
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-primary after:transition-all after:duration-300"
-            >
-              Agents
-            </Link>
-            {isLoggedIn ? (
-              <>
-                <Link
-                  href="/profile"
-                  className="text-sm hover:text-primary transition-colors flex items-center gap-1"
-                >
-                  <User className="w-4 h-4" />
-                  <span className="hidden md:inline">{user?.name || "Profile"}</span>
-                </Link>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleLogout}
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  <LogOut className="w-4 h-4" />
-                </Button>
-              </>
-            ) : (
-              <Link href="/login">
-                <Button
-                  size="sm"
-                  className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white border-0 shadow-md hover:shadow-lg transition-all duration-300"
-                >
-                  Login
-                </Button>
-              </Link>
-            )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={toggleTheme}
-              className="text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-200"
-            >
-              {theme === "light" ? (
-                <Moon className="w-4 h-4" />
-              ) : (
-                <Sun className="w-4 h-4" />
-              )}
-            </Button>
+            <Link href="/" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Home</Link>
+            <Link href="/agents/coordinator" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Ask Coordinator</Link>
           </div>
 
           {/* Mobile Toggle */}
           <div className="flex sm:hidden items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={toggleTheme}
-              className="text-muted-foreground"
-            >
-              {theme === "light" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
-            </Button>
             <Button
               variant="ghost"
               size="sm"
@@ -148,37 +66,13 @@ export default function ClientLayout({
           <div className="sm:hidden border-t border-border bg-background/95 backdrop-blur-xl animate-fade-in">
             <div className="container mx-auto px-4 py-3 space-y-2">
               <Link
-                href="/agents"
+                href="/"
                 className="block py-2 text-sm font-medium hover:text-primary transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                🤖 AI Agents
+                🏠 Home
               </Link>
-              {isLoggedIn ? (
-                <>
-                  <Link
-                    href="/profile"
-                    className="block py-2 text-sm hover:text-primary transition-colors"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    👤 {user?.name || "Profile"}
-                  </Link>
-                  <button
-                    className="block py-2 text-sm text-destructive hover:opacity-80 transition-colors"
-                    onClick={() => { handleLogout(); setMobileMenuOpen(false) }}
-                  >
-                    🚪 Logout
-                  </button>
-                </>
-              ) : (
-                <Link
-                  href="/login"
-                  className="block py-2 text-sm font-medium text-primary"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  🔑 Login / Sign Up
-                </Link>
-              )}
+              <Link href="/agents/coordinator" className="block py-2 text-sm font-medium hover:text-primary transition-colors" onClick={() => setMobileMenuOpen(false)}>🧠 Ask Coordinator</Link>
             </div>
           </div>
         )}

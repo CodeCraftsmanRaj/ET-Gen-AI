@@ -106,11 +106,11 @@ export default function LifeEventPage() {
     <div className="container mx-auto p-6 pb-12">
       <div className="mb-8">
         <h1 className="text-3xl font-bold flex items-center gap-3">
-          Life Event AI Advisor
+          LifeGoals
           <Badge className="bg-purple-500 hover:bg-purple-600 text-white border-0">AI Agent Active</Badge>
         </h1>
         <p className="text-muted-foreground mt-2">
-          Plan your finances for major life events dynamically with generative AI.
+          Plan your finances for major life goals dynamically with AI support.
         </p>
       </div>
 

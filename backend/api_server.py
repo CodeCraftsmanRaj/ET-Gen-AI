@@ -131,7 +131,7 @@ async def root():
             "stock-insight",       # Stock Market & Quotes
             "money-health",        # Financial Health Score
             "compliance-helper",   # SEBI & Compliance
-            "dhan-sarthi",         # Coordinator
+            "coordinator",         # Coordinator
             "life-goals",          # Life Event Planning
             "partner-finance"      # Couple Finance Planning
         ]
@@ -444,12 +444,12 @@ async def get_sebi_regulations():
     """Get SEBI regulations"""
     return SEBICompliance.get_regulations()
 
-# ============ DHAN SARTHI (Coordinator) ============
-@app.post("/dhan-sarthi/route")
+# ============ COORDINATOR ============
+@app.post("/coordinator/route")
 async def route_query(request: Dict[str, Any]):
     """Route query to appropriate agent with optional conversation context"""
-    from agents.dhan_sarthi.coordinator import DhanSarthiCoordinator, AgentType
-    coordinator = DhanSarthiCoordinator()
+    from agents.coordinator.coordinator import CoordinatorAgent, AgentType
+    coordinator = CoordinatorAgent()
     query = request.get("query", "")
     context = request.get("context", [])  # Recent chat messages from frontend
     
@@ -460,7 +460,7 @@ async def route_query(request: Dict[str, Any]):
     last_topic = None
     if context and isinstance(context, list):
         for msg in reversed(context):
-            if msg.get("agent") and msg["agent"] != "dhan-sarthi":
+            if msg.get("agent") and msg["agent"] != "coordinator":
                 last_agent = msg["agent"]
                 break
         # Get last user message for topic summary
@@ -469,11 +469,11 @@ async def route_query(request: Dict[str, Any]):
                 last_topic = msg.get("content", "")[:50]
                 break
     
-    # If DhanSarthi handles it directly (greeting/help/thanks/explain)
-    if result.primary_agent == AgentType.DHAN_SARTHI:
+    # If coordinator handles it directly (greeting/help/thanks/explain)
+    if result.primary_agent == AgentType.COORDINATOR:
         agent_list = [cap.name + " (" + cap.agent_type.value + ")" 
                       for cap in coordinator.AGENTS.values() 
-                      if cap.agent_type != AgentType.DHAN_SARTHI]
+                      if cap.agent_type != AgentType.COORDINATOR]
         
         # Context-aware greeting responses
         context_suffix = ""
@@ -492,10 +492,10 @@ async def route_query(request: Dict[str, Any]):
             context_suffix = f"\n\nLast time we discussed {topic_name}. Would you like to continue with that, or try something new?"
         
         responses = {
-            "greeting": f"Namaste! I'm DhanSarthi, your AI Money Mentor. I coordinate a team of 8 specialist agents to help you with taxes, investments, retirement planning, and more. How can I help you today?{context_suffix}",
-            "help": "I'm DhanSarthi, the brain of AI Money Mentor! Here's what my team can do:\n" + "\n".join(["- " + name for name in agent_list]) + "\nJust ask me anything financial and I'll route you to the right expert!",
+            "greeting": f"Namaste! I'm Coordinator, your AI Money Mentor. I coordinate a team of 8 specialist agents to help you with taxes, investments, retirement planning, and more. How can I help you today?{context_suffix}",
+            "help": "I'm Coordinator, the brain of AI Money Mentor! Here's what my team can do:\n" + "\n".join(["- " + name for name in agent_list]) + "\nJust ask me anything financial and I'll route you to the right expert!",
             "thanks": "You're welcome! Happy to help with your financial journey. Feel free to ask me anything anytime. Dhanyavaad! 🙏",
-            "explain": "I'm DhanSarthi, an AI-powered financial coordinator. I analyze your query and route it to the best specialist agent. Try asking about taxes, stocks, retirement, or financial health!",
+            "explain": "I'm Coordinator, an AI-powered financial coordinator. I analyze your query and route it to the best specialist agent. Try asking about taxes, stocks, retirement, or financial health!",
         }
         
         return {
@@ -577,8 +577,8 @@ async def get_rbi_regulation(name: str):
 @app.get("/latency-stats")
 async def get_latency_stats():
     """Get latency statistics"""
-    from agents.dhan_sarthi.coordinator import DhanSarthiCoordinator
-    coordinator = DhanSarthiCoordinator()
+    from agents.coordinator.coordinator import CoordinatorAgent
+    coordinator = CoordinatorAgent()
     return coordinator.get_latency_stats()
 
 # ============================================================
@@ -596,14 +596,13 @@ async def ai_chat_endpoint(request: dict):
     import json
     
     message = request.get("message", "")
-    agent = request.get("agent", "dhansarthi")
+    agent = request.get("agent", "coordinator")
     
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
     
     # Agent prompts
     AGENT_PROMPTS = {
-        "dhansarthi": "You are DhanSarthi, the intelligent coordinator of AI Money Mentor. Be conversational and helpful.",
-        "dhan-sarthi": "You are DhanSarthi, the intelligent coordinator of AI Money Mentor. Be conversational and helpful.",
+        "coordinator": "You are Coordinator, the intelligent coordinator of AI Money Mentor. Be conversational and helpful.",
         "karvid": "You are KarVid, the Tax Wizard for Indian taxes. Help users understand and calculate taxes.",
         "tax-master": "You are TaxMaster, the Tax Wizard for Indian taxes. Help users understand and calculate taxes.",
         "yojana": "You are YojanaKarta, the FIRE Planner. Help users plan financial independence and retirement.",
@@ -622,7 +621,7 @@ async def ai_chat_endpoint(request: dict):
     # Try OpenAI
     if OPENAI_API_KEY:
         try:
-            prompt = AGENT_PROMPTS.get(agent, AGENT_PROMPTS["dhansarthi"])
+            prompt = AGENT_PROMPTS.get(agent, AGENT_PROMPTS["coordinator"])
             response = requests.post(
                 "https://api.openai.com/v1/chat/completions",
                 headers={

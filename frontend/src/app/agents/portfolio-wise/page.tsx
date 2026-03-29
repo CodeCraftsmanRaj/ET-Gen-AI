@@ -166,11 +166,11 @@ export default function PortfolioWisePage() {
     <div className="container mx-auto p-6">
       <div className="mb-8">
         <h1 className="text-3xl font-bold flex items-center gap-3">
-          📊 Niveshak 
+          📊 PortfolioWise
           <Badge className="bg-blue-500 hover:bg-blue-600 text-white border-0">AI Agent Active</Badge>
         </h1>
         <p className="text-muted-foreground mt-2">
-          MF Portfolio X-Ray Agent — powered by OpenClaw.
+          MF Portfolio X-Ray Agent for analysis, risk insights, and rebalancing.
         </p>
       </div>
 

@@ -17,8 +17,8 @@ export const frontendApi = axios.create({
   },
 })
 
-// Tax Calculator API
-export const karvidApi = {
+// TaxMaster API
+export const taxMasterApi = {
   calculateTax: async (data: any) => {
     const response = await backendApi.post('/tax-master/calculate-tax', data)
     return response.data
@@ -57,8 +57,8 @@ export const dhanApi = {
   },
 }
 
-// MF Portfolio API
-export const niveshakApi = {
+// PortfolioWise API
+export const portfolioWiseApi = {
   calculateXIRR: async (data: any) => {
     const response = await backendApi.post('/portfolio-wise/xirr', data)
     return response.data
@@ -93,8 +93,8 @@ export const couplePlannerApi = {
   },
 }
 
-// Compliance API
-export const vidhiApi = {
+// ComplianceHelper API
+export const complianceHelperApi = {
   getDisclaimers: async () => {
     const response = await backendApi.get('/compliance-helper/disclaimers')
     return response.data
@@ -102,9 +102,9 @@ export const vidhiApi = {
 }
 
 // Query Routing API
-export const dhanSarthiApi = {
+export const coordinatorApi = {
   route: async (query: string) => {
-    const response = await backendApi.post('/dhan-sarthi/route', { query })
+    const response = await backendApi.post('/coordinator/route', { query })
     return response.data
   },
 }
@@ -122,3 +122,8 @@ export const formatINR = (amount: number) => {
 export const formatPercent = (value: number) => {
   return `${value.toFixed(2)}%`
 }
+
+// Backward-compatible aliases
+export const karvidApi = taxMasterApi
+export const niveshakApi = portfolioWiseApi
+export const vidhiApi = complianceHelperApi

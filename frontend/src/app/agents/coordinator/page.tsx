@@ -17,6 +17,7 @@ interface Message {
 }
 
 const agentNames: Record<string, string> = {
+  "coordinator": "🧠 Coordinator",
   "portfolio-wise": "📊 PortfolioWise",
   "tax-master": "🧾 TaxMaster",
   "retirement-pro": "🎯 RetirementPro",
@@ -25,10 +26,10 @@ const agentNames: Record<string, string> = {
   "compliance-helper": "⚖️ ComplianceHelper",
   "life-goals": "🎉 LifeGoals",
   "partner-finance": "💑 PartnerFinance",
-  "dhan-sarthi": "🧠 DhanSarthi",
 }
 
 const agentColorMap: Record<string, string> = {
+  "coordinator": "from-purple-500/25 to-indigo-600/15 border-purple-500/30",
   "portfolio-wise": "from-blue-500/25 to-blue-600/15 border-blue-500/30",
   "tax-master": "from-green-500/25 to-green-600/15 border-green-500/30",
   "retirement-pro": "from-orange-500/25 to-orange-600/15 border-orange-500/30",
@@ -37,7 +38,6 @@ const agentColorMap: Record<string, string> = {
   "compliance-helper": "from-slate-400/25 to-slate-500/15 border-slate-400/30",
   "life-goals": "from-teal-500/25 to-teal-600/15 border-teal-500/30",
   "partner-finance": "from-rose-400/25 to-rose-500/15 border-rose-400/30",
-  "dhan-sarthi": "from-purple-500/25 to-indigo-600/15 border-purple-500/30",
 }
 
 const quickPrompts = [
@@ -49,13 +49,13 @@ const quickPrompts = [
   { label: "SEBI rules", icon: Scale, color: "text-slate-300 border-slate-500/30 hover:bg-slate-500/10" },
 ]
 
-export default function DhanSarthiPage() {
+export default function CoordinatorPage() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
       role: "assistant",
-      content: "Hello! I am **DhanSarthi**, your AI financial coordinator.\n\nI can help you with:\n• 🧾 **Tax calculations** — \"Calculate tax for 15 lakhs\"\n• 🎯 **FIRE planning** — \"What is FIRE?\" or \"My expenses are 50K\"\n• 📈 **Stock prices** — \"RELIANCE stock price\"\n• 💪 **Financial health** — \"What is my health score?\"\n• ⚖️ **Legal/Compliance** — \"What are SEBI regulations?\"\n• 🎉 **Life Events** — \"Plan for my wedding\"\n• 💑 **Couple Finance** — \"Joint budget with my partner\"\n\nWhat would you like to know?",
-      agent: "dhan-sarthi",
+      content: "Hello! I am your **Coordinator**, your AI financial guide.\n\nI can help you with:\n• 🧾 **Tax calculations** — \"Calculate tax for 15 lakhs\"\n• 🎯 **FIRE planning** — \"What is FIRE?\" or \"My expenses are 50K\"\n• 📈 **Stock prices** — \"RELIANCE stock price\"\n• 💪 **Financial health** — \"What is my health score?\"\n• ⚖️ **Legal/Compliance** — \"What are SEBI regulations?\"\n• 🎉 **Life Events** — \"Plan for my wedding\"\n• 💑 **Couple Finance** — \"Joint budget with my partner\"\n\nWhat would you like to know?",
+      agent: "coordinator",
       timestamp: new Date(),
     },
   ])
@@ -70,7 +70,7 @@ export default function DhanSarthiPage() {
   }, [messages])
 
   useEffect(() => {
-    fetch("/api/dhan-sarthi")
+    fetch("/api/coordinator")
       .then((res) => {
         if (res.ok) setBackendStatus("online")
         else setBackendStatus("offline")
@@ -103,7 +103,7 @@ export default function DhanSarthiPage() {
                   id: m.id + '-resp',
                   role: 'assistant' as const,
                   content: original?.response || '',
-                  agent: original?.agentType || 'dhan-sarthi',
+                  agent: original?.agentType || 'coordinator',
                   timestamp: new Date(original?.createdAt || Date.now()),
                 }
               ]
@@ -192,7 +192,7 @@ export default function DhanSarthiPage() {
         body: JSON.stringify({
           message: query,
           user_id: getUserId(),
-          agent_id: "dhan-sarthi",
+          agent_id: "coordinator",
           session_id: sessionId,
         }),
       })
@@ -205,12 +205,12 @@ export default function DhanSarthiPage() {
         }
 
         const aiResponse = data.response || "I'm processing your request. Please try again."
-        const agentId = data.agent || "dhan-sarthi"
+        const agentId = data.agent || "coordinator"
 
         await simulateStreaming(aiResponse, agentId)
         saveChat(query, aiResponse, agentId)
       } else {
-        const fallbackResponse = await fetch("/api/dhan-sarthi", {
+        const fallbackResponse = await fetch("/api/coordinator", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ query }),
@@ -225,10 +225,10 @@ export default function DhanSarthiPage() {
             id: String(Date.now() + 1),
             role: "assistant",
             content: fallbackText,
-            agent: "dhan-sarthi",
+            agent: "coordinator",
             timestamp: new Date(),
           }])
-          saveChat(query, fallbackText, "dhan-sarthi")
+          saveChat(query, fallbackText, "coordinator")
         } else {
           throw new Error("Both bridge and fallback failed")
         }
@@ -261,7 +261,7 @@ export default function DhanSarthiPage() {
           </div>
           <div>
             <h1 className="text-2xl font-bold flex items-center gap-2">
-              DhanSarthi
+              Coordinator
               <Badge className="bg-gradient-to-r from-purple-500 to-indigo-600 border-0 text-white text-xs shadow-sm">
                 <Sparkles className="w-3 h-3 mr-1" />
                 AI Coordinator
@@ -285,15 +285,15 @@ export default function DhanSarthiPage() {
                 <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   {msg.role === 'assistant' && (
                     <div className="flex-shrink-0 mr-3 mt-1">
-                      <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${agentColorMap[msg.agent || 'dhan-sarthi'] || agentColorMap['dhan-sarthi']} flex items-center justify-center text-xs border`}>
-                        {msg.agent === 'dhan-sarthi' ? '🧠' : msg.agent === 'tax-master' ? '🧾' : msg.agent === 'retirement-pro' ? '🎯' : msg.agent === 'stock-insight' ? '📈' : msg.agent === 'portfolio-wise' ? '📊' : msg.agent === 'money-health' ? '💪' : msg.agent === 'compliance-helper' ? '⚖️' : msg.agent === 'life-goals' ? '🎉' : msg.agent === 'partner-finance' ? '💑' : '🤖'}
+                      <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${agentColorMap[msg.agent || 'coordinator'] || agentColorMap['coordinator']} flex items-center justify-center text-xs border`}>
+                        {msg.agent === 'coordinator' ? '🧠' : msg.agent === 'tax-master' ? '🧾' : msg.agent === 'retirement-pro' ? '🎯' : msg.agent === 'stock-insight' ? '📈' : msg.agent === 'portfolio-wise' ? '📊' : msg.agent === 'money-health' ? '💪' : msg.agent === 'compliance-helper' ? '⚖️' : msg.agent === 'life-goals' ? '🎉' : msg.agent === 'partner-finance' ? '💑' : '🤖'}
                       </div>
                     </div>
                   )}
                   <div className={`max-w-[85%] rounded-2xl p-4 ${
                     msg.role === 'user' 
                       ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/20' 
-                      : `bg-gradient-to-br ${agentColorMap[msg.agent || 'dhan-sarthi'] || agentColorMap['dhan-sarthi']} text-white backdrop-blur-sm border`
+                      : `bg-gradient-to-br ${agentColorMap[msg.agent || 'coordinator'] || agentColorMap['coordinator']} text-white backdrop-blur-sm border`
                   }`}>
                     {msg.agent && msg.role === 'assistant' && (
                       <div className="flex items-center gap-2 mb-2 pb-2 border-b border-white/10">
@@ -318,7 +318,7 @@ export default function DhanSarthiPage() {
                       <span className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
                       <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
                     </div>
-                    <span className="text-sm text-purple-200/80">DhanSarthi is routing your query...</span>
+                    <span className="text-sm text-purple-200/80">Coordinator is routing your query...</span>
                   </div>
                 </div>
               )}

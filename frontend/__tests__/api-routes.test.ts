@@ -279,13 +279,13 @@ describe('Couple Planner API', () => {
   })
 })
 
-// ============ DHAN-SARTHI (Coordinator) ============
+// ============ COORDINATOR ============
 
-describe('DhanSarthi Coordinator API', () => {
+describe('Coordinator API', () => {
   beforeEach(() => mockFetch.mockClear())
 
   it('proxies routing query to backend', async () => {
-    const { POST } = await import('../src/app/api/dhan-sarthi/route')
+    const { POST } = await import('../src/app/api/coordinator/route')
     mockBackendSuccess({ primary_agent: 'karvid', confidence: 0.95 })
 
     const res = await POST(createMockRequest({ query: 'calculate my tax' }))

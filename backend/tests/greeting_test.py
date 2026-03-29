@@ -6,7 +6,7 @@ results = []
 
 def test(name, body, expected_agent, expected_intent=None):
     try:
-        r = requests.post(BASE + "/dhan-sarthi/route", json=body, timeout=8)
+        r = requests.post(BASE + "/coordinator/route", json=body, timeout=8)
         if r.status_code == 200:
             data = r.json()
             agent = data.get("primary_agent", "unknown")
@@ -34,39 +34,39 @@ def test(name, body, expected_agent, expected_intent=None):
         print("  FAIL: " + name + " -> " + str(e)[:60])
 
 print("=" * 60)
-print("  DHANSARTHI GREETING & GENERIC QUERY TEST")
+print("  COORDINATOR GREETING & GENERIC QUERY TEST")
 print("=" * 60)
 
 # Greetings
 print("\n--- Greetings ---")
-test("Hello", {"query": "hello"}, "dhan-sarthi", "greeting")
-test("Hi there", {"query": "hi there"}, "dhan-sarthi", "greeting")
-test("Hey!", {"query": "hey!"}, "dhan-sarthi", "greeting")
-test("Namaste", {"query": "namaste"}, "dhan-sarthi", "greeting")
-test("Good morning", {"query": "good morning"}, "dhan-sarthi", "greeting")
-test("Good evening", {"query": "good evening"}, "dhan-sarthi", "greeting")
+test("Hello", {"query": "hello"}, "coordinator", "greeting")
+test("Hi there", {"query": "hi there"}, "coordinator", "greeting")
+test("Hey!", {"query": "hey!"}, "coordinator", "greeting")
+test("Namaste", {"query": "namaste"}, "coordinator", "greeting")
+test("Good morning", {"query": "good morning"}, "coordinator", "greeting")
+test("Good evening", {"query": "good evening"}, "coordinator", "greeting")
 
 # Help / What can you do
 print("\n--- Help / About ---")
-test("What can you do?", {"query": "what can you do?"}, "dhan-sarthi", "help")
-test("Who are you?", {"query": "who are you?"}, "dhan-sarthi", "help")
-test("Help me", {"query": "help me"}, "dhan-sarthi", "help")
-test("What is this?", {"query": "what is this?"}, "dhan-sarthi")
+test("What can you do?", {"query": "what can you do?"}, "coordinator", "help")
+test("Who are you?", {"query": "who are you?"}, "coordinator", "help")
+test("Help me", {"query": "help me"}, "coordinator", "help")
+test("What is this?", {"query": "what is this?"}, "coordinator")
 
 # Thanks
 print("\n--- Thanks / Goodbye ---")
-test("Thank you!", {"query": "thank you!"}, "dhan-sarthi", "thanks")
-test("Thanks a lot", {"query": "thanks a lot"}, "dhan-sarthi", "thanks")
-test("Dhanyavaad", {"query": "dhanyavaad"}, "dhan-sarthi", "thanks")
-test("Bye!", {"query": "bye!"}, "dhan-sarthi", "thanks")
+test("Thank you!", {"query": "thank you!"}, "coordinator", "thanks")
+test("Thanks a lot", {"query": "thanks a lot"}, "coordinator", "thanks")
+test("Dhanyavaad", {"query": "dhanyavaad"}, "coordinator", "thanks")
+test("Bye!", {"query": "bye!"}, "coordinator", "thanks")
 
 # Generic explain
 print("\n--- Generic Explain ---")
-test("Explain how it works", {"query": "explain how it works"}, "dhan-sarthi", "explain")
-test("What is AI money mentor", {"query": "what is ai money mentor"}, "dhan-sarthi")
+test("Explain how it works", {"query": "explain how it works"}, "coordinator", "explain")
+test("What is AI money mentor", {"query": "what is ai money mentor"}, "coordinator")
 
-# Finance-specific queries should NOT route to DhanSarthi
-print("\n--- Finance queries (should NOT route to DhanSarthi) ---")
+# Finance-specific queries should NOT route to Coordinator
+print("\n--- Finance queries (should NOT route to Coordinator) ---")
 test("Hello, calculate my tax", {"query": "hello, calculate my tax for 15 lakh"}, "karvid")
 test("Hi, what is RELIANCE stock", {"query": "hi, what is reliance stock price"}, "bazaar")
 test("Help me retire early", {"query": "help me with fire retirement planning"}, "yojana")

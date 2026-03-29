@@ -2,7 +2,7 @@
 
 This project uses a multi-agent setup where each agent handles a specific finance domain.
 
-## 1) DhanSarthi (Coordinator)
+## 1) Coordinator
 - Entry-point and router for user questions.
 - Detects intent and sends the query to the right specialist agent.
 - Handles greetings/help and conversation continuity.
@@ -50,6 +50,6 @@ This project uses a multi-agent setup where each agent handles a specific financ
 
 ## Typical flow
 1. User asks a question.
-2. DhanSarthi identifies intent.
+2. Coordinator identifies intent.
 3. Query is routed to one or more specialist agents.
 4. Response is returned with domain-specific calculations/guidance.

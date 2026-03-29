@@ -1,5 +1,5 @@
 """
-DhanSarthi Coordinator - The Brain of AI Money Mentor
+Coordinator Agent - The Brain of AI Money Mentor
 Routes queries to appropriate specialist agents with intelligence
 """
 
@@ -12,7 +12,7 @@ import requests
 
 class AgentType(Enum):
     """Available specialist agents"""
-    DHAN_SARTHI = "dhan-sarthi" # Coordinator/Greeting/Generic
+    COORDINATOR = "coordinator" # Coordinator/Greeting/Generic
     PORTFOLIO_WISE = "portfolio-wise"       # MF Portfolio X-Ray
     TAX_MASTER = "tax-master"           # Tax Wizard
     RETIREMENT_PRO = "retirement-pro"      # FIRE Planner
@@ -60,7 +60,7 @@ class QueryResult:
     from_cache: bool = False
 
 
-class DhanSarthiCoordinator:
+class CoordinatorAgent:
     """
     The Brain of AI Money Mentor
     
@@ -77,9 +77,9 @@ class DhanSarthiCoordinator:
     
     # Agent capabilities with detailed knowledge
     AGENTS: Dict[AgentType, AgentCapability] = {
-        AgentType.DHAN_SARTHI: AgentCapability(
-            name="DhanSarthi",
-            agent_type=AgentType.DHAN_SARTHI,
+        AgentType.COORDINATOR: AgentCapability(
+            name="Coordinator",
+            agent_type=AgentType.COORDINATOR,
             description="AI Money Mentor Coordinator - Greets, explains capabilities, routes queries to specialist agents",
             keywords=["hello", "hi", "hey", "namaste", "namaskar", "good morning", "good evening",
                      "good afternoon", "help", "what can you do", "who are you", "about",
@@ -94,7 +94,7 @@ class DhanSarthiCoordinator:
             ],
             confidence_threshold=0.3,
             can_delegate=False,
-            api_endpoint="/dhan-sarthi/route"
+            api_endpoint="/coordinator/route"
         ),
         AgentType.PORTFOLIO_WISE: AgentCapability(
             name="PortfolioWise",
@@ -292,26 +292,26 @@ class DhanSarthiCoordinator:
             
             return RoutingResult(
                 query=query,
-                primary_agent=AgentType.DHAN_SARTHI,
+                primary_agent=AgentType.COORDINATOR,
                 confidence=1.0,
                 intent=intent,
                 secondary_agents=[],
-                api_endpoint="/dhan-sarthi/route",
+                api_endpoint="/coordinator/route",
                 suggestions=[cap.example_queries[0] for cap in list(self.AGENTS.values())[1:5]],
                 processing_time_ms=processing_time
             )
         
-        # For generic explanations without finance keywords, handle via DhanSarthi
+        # For generic explanations without finance keywords, handle via Coordinator
         if is_generic_explain and not has_finance_content:
             processing_time = (time.time() - start_time) * 1000
             self.latency_stats["routing"].append(processing_time)
             return RoutingResult(
                 query=query,
-                primary_agent=AgentType.DHAN_SARTHI,
+                primary_agent=AgentType.COORDINATOR,
                 confidence=0.8,
                 intent="explain",
                 secondary_agents=[],
-                api_endpoint="/dhan-sarthi/route",
+                api_endpoint="/coordinator/route",
                 suggestions=[cap.example_queries[0] for cap in list(self.AGENTS.values())[1:5]],
                 processing_time_ms=processing_time
             )
@@ -612,6 +612,6 @@ class DhanSarthiCoordinator:
         return stats
 
 
-def create_coordinator() -> DhanSarthiCoordinator:
+def create_coordinator() -> CoordinatorAgent:
     """Factory function to create coordinator"""
-    return DhanSarthiCoordinator()
+    return CoordinatorAgent()

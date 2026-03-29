@@ -1,5 +1,5 @@
 """
-AI Responder for DhanSarthi
+AI Responder for Coordinator
 Uses OpenAI GPT-4o-mini for intelligent responses
 """
 
@@ -15,7 +15,7 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
 AGENT_PROMPTS = {
-    "dhansarthi": """You are DhanSarthi, the intelligent coordinator of AI Money Mentor.
+    "coordinator": """You are Coordinator, the intelligent router of AI Money Mentor.
 You route financial queries and explain things conversationally.
 You're helpful, knowledgeable about Indian finance, and guide users step by step.
 Respond in a friendly, conversational manner. Be concise but thorough.""",
@@ -62,7 +62,7 @@ def get_ai_response(agent: str, user_message: str, context: Optional[str] = None
         "Content-Type": "application/json"
     }
     
-    prompt = AGENT_PROMPTS.get(agent, AGENT_PROMPTS["dhansarthi"])
+    prompt = AGENT_PROMPTS.get(agent, AGENT_PROMPTS["coordinator"])
     
     messages = [
         {"role": "system", "content": prompt},

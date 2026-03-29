@@ -25,8 +25,8 @@ def test(name, method, endpoint, body=None, timeout=8):
         results.append(("FAIL", name, str(e)[:80]))
         return None
 
-# 1. DhanSarthi (Coordinator)
-test("DhanSarthi: route tax query", "POST", "/dhan-sarthi/route",
+# 1. Coordinator
+test("Coordinator: route tax query", "POST", "/coordinator/route",
      {"query": "calculate tax for 15 lakh"}, timeout=10)
 
 # 2. KarVid (Tax)

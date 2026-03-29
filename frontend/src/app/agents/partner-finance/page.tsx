@@ -30,7 +30,7 @@ export default function CouplePlannerPage() {
   const [messages, setMessages] = useState<Message[]>([{
     id: "init",
     role: "assistant",
-    content: "I am the Couple's Finance Planner. Fill out the joint income form or ask me directly to help plan your shared finances, budgets, and couples' SIPs!",
+    content: "I am PartnerFinance. Fill out the joint income form or ask me directly to help plan your shared finances, budgets, and couple SIPs!",
   }])
   const [input, setInput] = useState("")
   const [chatLoading, setChatLoading] = useState(false)
@@ -103,7 +103,7 @@ export default function CouplePlannerPage() {
             </div>
             <div className="flex-1">
               <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                Couple&apos;s AI Planner
+                PartnerFinance
               </h1>
               <p className="text-muted-foreground mt-1">Plan your shared finances together intelligently</p>
             </div>

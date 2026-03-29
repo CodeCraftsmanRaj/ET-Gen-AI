@@ -26,10 +26,10 @@ def test(name, method, endpoint, body=None, timeout=8):
         return None
 
 # ==========================================
-# PART 1: DHANSARTHI ROUTING VERIFICATION
+# PART 1: COORDINATOR ROUTING VERIFICATION
 # ==========================================
 print("=" * 60)
-print("  PART 1: DHANSARTHI SWARM ROUTING")
+print("  PART 1: COORDINATOR SWARM ROUTING")
 print("=" * 60)
 
 routing_tests = [
@@ -45,7 +45,7 @@ routing_tests = [
 ]
 
 for name, body, expected_agent in routing_tests:
-    d = test("Route: " + name, "POST", "/dhan-sarthi/route", body, timeout=10)
+    d = test("Route: " + name, "POST", "/coordinator/route", body, timeout=10)
     if d:
         actual = d.get("primary_agent", "unknown")
         if actual == expected_agent:

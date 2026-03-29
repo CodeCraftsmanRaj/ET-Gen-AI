@@ -1,10 +1,10 @@
 """
-DhanSarthi Telegram Bot with AI
+Coordinator Telegram Bot with AI
 Uses OpenAI GPT-4 for intelligent responses
 
 IMPORTANT: Bot tokens are loaded from environment variables.
 Create a .env file with your tokens:
-  DHANSARTHI_BOT_TOKEN=your_token
+    COORDINATOR_BOT_TOKEN=your_token
   KARVID_BOT_TOKEN=your_token
   etc.
 """
@@ -31,7 +31,7 @@ OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
 # Bot Tokens (loaded from environment variables)
 BOT_TOKENS = {
-    "dhansarthi": os.getenv("DHANSARTHI_BOT_TOKEN", ""),
+    "coordinator": os.getenv("COORDINATOR_BOT_TOKEN", ""),
     "tax-master": os.getenv("KARVID_BOT_TOKEN", ""),
     "portfolio-wise": os.getenv("NIVESHAK_BOT_TOKEN", ""),
     "retirement-pro": os.getenv("YOJANA_BOT_TOKEN", ""),
@@ -49,7 +49,7 @@ for agent, token in BOT_TOKENS.items():
 
 # Agent Personalities
 AGENT_PROMPTS = {
-    "dhansarthi": """You are DhanSarthi, the intelligent coordinator of AI Money Mentor.
+    "coordinator": """You are Coordinator, the intelligent router of AI Money Mentor.
 You coordinate 8 specialist agents and route financial queries to the right one.
 
 Available Agents (8 Specialists):
@@ -168,7 +168,7 @@ def call_backend_api(endpoint: str, data: Dict[str, Any]) -> Optional[Dict]:
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE, agent: str):
     """Handle incoming message with AI response"""
     user_message = update.message.text
-    prompt = AGENT_PROMPTS.get(agent, AGENT_PROMPTS["dhansarthi"])
+    prompt = AGENT_PROMPTS.get(agent, AGENT_PROMPTS["coordinator"])
     
     # Get AI response
     response = call_openai(prompt, user_message)
@@ -189,7 +189,7 @@ def create_bot(token: str, agent: str):
 async def handle_start(update: Update, context: ContextTypes.DEFAULT_TYPE, agent: str):
     """Handle /start command"""
     agent_names = {
-        "dhansarthi": "DhanSarthi",
+        "coordinator": "Coordinator",
         "tax-master": "KarVid - Tax Wizard",
         "portfolio-wise": "Niveshak - MF Analyst",
         "retirement-pro": "YojanaKarta - FIRE Planner",
@@ -212,7 +212,7 @@ async def handle_start(update: Update, context: ContextTypes.DEFAULT_TYPE, agent
 
 if __name__ == "__main__":
     import sys
-    agent = sys.argv[1] if len(sys.argv) > 1 else "dhansarthi"
+    agent = sys.argv[1] if len(sys.argv) > 1 else "coordinator"
     token = BOT_TOKENS.get(agent)
     
     if not token:

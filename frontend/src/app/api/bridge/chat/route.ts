@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         message,
         user_id,
-        agent_id: agent_id || 'dhan-sarthi',
+        agent_id: agent_id || 'coordinator',
         session_id: session_id || null,
       }),
     })

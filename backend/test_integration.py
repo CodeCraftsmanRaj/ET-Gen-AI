@@ -77,7 +77,7 @@ class IntegrationTester:
                 "stock-insight",
                 "money-health",
                 "compliance-helper",
-                "dhan-sarthi",
+                "coordinator",
                 "life-goals",
                 "partner-finance"
             ]
@@ -174,7 +174,7 @@ class IntegrationTester:
         self.print_header("Frontend Pages Accessibility")
         
         pages = [
-            "dhan-sarthi",
+            "coordinator",
             "money-health",
             "tax-master",
             "retirement-pro",
@@ -281,7 +281,7 @@ if __name__ == "__main__":
                 "stock-insight",
                 "money-health",
                 "compliance-helper",
-                "dhan-sarthi",
+                "coordinator",
                 "life-goals",
                 "partner-finance"
             ]

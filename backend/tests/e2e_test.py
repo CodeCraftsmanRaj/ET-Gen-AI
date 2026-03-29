@@ -33,7 +33,7 @@ test("Yojana FIRE", "POST", f"{BASE}/yojana/fire-number", {"monthly_expenses": 5
 test("Bazaar Stock", "POST", f"{BASE}/bazaar/stock-quote", {"symbol": "RELIANCE"})
 test("Dhan Health", "POST", f"{BASE}/dhan/health-score", {"income": 100000, "expenses": 60000, "monthly_savings": 20000, "monthly_investments": 10000})
 test("Vidhi Disclaimers", "GET", f"{BASE}/vidhi/disclaimers")
-test("DhanSarthi Route", "POST", f"{BASE}/dhan-sarthi/route", {"query": "calculate my tax"})
+test("Coordinator Route", "POST", f"{BASE}/coordinator/route", {"query": "calculate my tax"})
 
 # NEW agents
 test("Life Event Types", "GET", f"{BASE}/life-event/types")

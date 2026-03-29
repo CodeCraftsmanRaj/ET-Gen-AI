@@ -28,7 +28,7 @@ os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
 BACKEND_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:8000")
 
 AGENT_PROMPTS = {
-    "dhan-sarthi": "You are DhanSarthi, the AI coordinator for personal finance in India. Be concise and practical.",
+    "coordinator": "You are Coordinator, the AI coordinator for personal finance in India. Be concise and practical.",
     "tax-master": "You are TaxMaster, Indian tax advisor. Explain old/new regime, deductions, and legal tax optimization.",
     "retirement-pro": "You are RetirementPro, FIRE and retirement planner. Use clear assumptions and practical SIP guidance.",
     "stock-insight": "You are StockInsight. Provide educational market insights and include a SEBI caution.",
@@ -104,7 +104,7 @@ def send_to_agent(agent_id: str, message: str, session_id: str = None) -> str:
     """
     # NOTE: Avoid calling this same FastAPI service over HTTP from inside a request
     # handler, which can deadlock/time out under single-worker dev mode.
-    prompt = AGENT_PROMPTS.get(agent_id, AGENT_PROMPTS["dhan-sarthi"])
+    prompt = AGENT_PROMPTS.get(agent_id, AGENT_PROMPTS["coordinator"])
 
     openai_api_key = (os.getenv("OPENAI_API_KEY", "") or "").strip().strip('"')
     openai_model = (os.getenv("OPENAI_MODEL", "gpt-4o-mini") or "gpt-4o-mini").strip()
@@ -147,7 +147,7 @@ class ChatRequest(BaseModel):
     message: str
     user_id: str
     session_id: Optional[str] = None
-    agent_id: str = 'dhan-sarthi'
+    agent_id: str = 'coordinator'
 
 class ChatResponse(BaseModel):
     agent: str
