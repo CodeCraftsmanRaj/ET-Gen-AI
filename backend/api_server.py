@@ -136,7 +136,7 @@ async def root():
 async def health():
     return {"status": "healthy"}
 
-# ============ NIVESHAK (MF Portfolio) ============
+# ============ PORTFOLIO_WISE (MF Portfolio) ============
 @app.post("/portfolio-wise/xirr")
 async def calculate_xirr(request: XIRRRequest):
     """Calculate XIRR for portfolio"""
@@ -219,7 +219,7 @@ async def analyze_portfolio(request: Dict[str, Any]):
         "xray": xray
     }
 
-# ============ KARVID (Tax Wizard) ============
+# ============ TAX_MASTER (Tax Wizard) ============
 @app.post("/tax-master/calculate-tax")
 async def calculate_tax(request: TaxRequest):
     """Calculate tax under specified regime"""
@@ -310,7 +310,7 @@ async def calculate_capital_gains(request: Dict[str, Any]):
     
     return result
 
-# ============ YOJANAKARTA (FIRE Planner) ============
+# ============ RETIREMENT_PRO (FIRE Planner) ============
 @app.post("/retirement-pro/fire-number")
 async def get_fire_number(request: Dict[str, Any]):
     """Calculate FIRE number"""
@@ -428,7 +428,7 @@ async def calculate_health_score(request: HealthRequest):
     result["six_dimension_scorecard"] = _summarize_health_six_dimensions(result, payload)
     return result
 
-# ============ VIDHI (Compliance) ============
+# ============ COMPLIANCE_HELPER (Compliance) ============
 @app.get("/compliance-helper/disclaimers")
 async def get_all_disclaimers(category: str = "all"):
     """Get SEBI compliance disclaimers"""
@@ -474,14 +474,14 @@ async def route_query(request: Dict[str, Any]):
         context_suffix = ""
         if last_agent and last_topic:
             agent_names = {
-                "karvid": "tax calculations",
-                "yojana": "retirement planning", 
-                "bazaar": "stock market data",
-                "dhan": "financial health",
-                "niveshak": "portfolio analysis",
-                "vidhi": "compliance queries",
-                "life-event": "life event planning",
-                "couple-planner": "couple finance planning"
+                "tax-master": "tax calculations",
+                "retirement-pro": "retirement planning", 
+                "stock-insight": "stock market data",
+                "money-health": "financial health",
+                "portfolio-wise": "portfolio analysis",
+                "compliance-helper": "compliance queries",
+                "life-goals": "life event planning",
+                "partner-finance": "couple finance planning"
             }
             topic_name = agent_names.get(last_agent, last_agent)
             context_suffix = f"\n\nLast time we discussed {topic_name}. Would you like to continue with that, or try something new?"
@@ -509,14 +509,14 @@ async def route_query(request: Dict[str, Any]):
     # For routed queries: if confidence is low and we have previous context, bias toward last agent
     if result.confidence < 0.4 and last_agent:
         agent_map = {
-            "karvid": AgentType.KARVID,
-            "yojana": AgentType.YOJANA,
-            "bazaar": AgentType.BAZAAR,
-            "dhan": AgentType.DHAN,
-            "niveshak": AgentType.NIVESHAK,
-            "vidhi": AgentType.VIDHI,
-            "life-event": AgentType.LIFE_EVENT,
-            "couple-planner": AgentType.COUPLE_PLANNER,
+            "tax-master": AgentType.TAX_MASTER,
+            "retirement-pro": AgentType.RETIREMENT_PRO,
+            "stock-insight": AgentType.STOCK_INSIGHT,
+            "money-health": AgentType.MONEY_HEALTH,
+            "portfolio-wise": AgentType.PORTFOLIO_WISE,
+            "compliance-helper": AgentType.COMPLIANCE_HELPER,
+            "life-goals": AgentType.LIFE_GOALS,
+            "partner-finance": AgentType.PARTNER_FINANCE,
         }
         if last_agent in agent_map:
             result.primary_agent = agent_map[last_agent]
@@ -528,44 +528,44 @@ async def route_query(request: Dict[str, Any]):
 @app.get("/tax-master/section/{section}")
 async def get_tax_section(section: str):
     """Get detailed information about a tax section"""
-    from agents.karvid.indian_tax_laws import get_tax_section_info
+    from agents.tax_master.indian_tax_laws import get_tax_section_info
     return get_tax_section_info(section)
 
 @app.get("/tax-master/capital-gains-info/{asset_type}")
 async def get_capital_gains_info(asset_type: str):
     """Get capital gains tax information"""
-    from agents.karvid.indian_tax_laws import get_capital_gains_info
+    from agents.tax_master.indian_tax_laws import get_capital_gains_info
     return get_capital_gains_info(asset_type)
 
 @app.get("/tax-master/tax-slabs/{regime}")
 async def get_tax_slabs(regime: str):
     """Get tax slabs for a regime"""
-    from agents.karvid.indian_tax_laws import get_tax_slab
+    from agents.tax_master.indian_tax_laws import get_tax_slab
     return {"slabs": get_tax_slab(regime)}
 
 # ============ VIDHI LEGAL ENDPOINTS ============
 @app.get("/compliance-helper/constitution/{article}")
 async def get_constitution_article(article: str):
     """Get Constitution provision"""
-    from agents.vidhi.legal_knowledge import get_constitution_provision
+    from agents.compliance_helper.legal_knowledge import get_constitution_provision
     return get_constitution_provision(article)
 
 @app.get("/compliance-helper/income-tax-section/{section}")
 async def get_income_tax_section(section: str):
     """Get Income Tax Act section"""
-    from agents.vidhi.legal_knowledge import get_income_tax_section
+    from agents.compliance_helper.legal_knowledge import get_income_tax_section
     return {"section": section, "description": get_income_tax_section(section)}
 
 @app.get("/compliance-helper/sebi-regulation/{name}")
 async def get_sebi_regulation(name: str):
     """Get SEBI regulation details"""
-    from agents.vidhi.legal_knowledge import get_sebi_regulation
+    from agents.compliance_helper.legal_knowledge import get_sebi_regulation
     return get_sebi_regulation(name)
 
 @app.get("/compliance-helper/rbi-regulation/{name}")
 async def get_rbi_regulation(name: str):
     """Get RBI regulation details"""
-    from agents.vidhi.legal_knowledge import get_rbi_regulation
+    from agents.compliance_helper.legal_knowledge import get_rbi_regulation
     return get_rbi_regulation(name)
 
 # ============ LATENCY TRACKING ============
@@ -745,7 +745,7 @@ async def bridge_list_sessions(user_id: str):
     return {"sessions": sessions}
 
 # ============ LIFE EVENT ADVISOR ============
-from agents.life_event import (
+from agents.life_goals import (
     get_event_types,
     plan_life_event,
     comprehensive_plan as life_event_comprehensive_plan
@@ -789,7 +789,7 @@ async def life_event_comprehensive(request: Dict[str, Any]):
         }
 
 # ============ COUPLE PLANNER ============
-from agents.couple_planner import (
+from agents.partner_finance import (
     create_couple_plan,
     calculate_expense_split,
     optimize_couple_tax_and_protection,

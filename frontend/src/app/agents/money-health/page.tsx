@@ -17,7 +17,7 @@ interface Message {
   content: string
 }
 
-export default function DhanPage() {
+export default function MoneyHealthPage() {
   const [formData, setFormData, hasLoaded] = useLocalStorage("dhan_form", {
     monthlyIncome: 100000,
     monthlyExpenses: 60000,
@@ -32,7 +32,7 @@ export default function DhanPage() {
 
   // AI Chat state
   const [messages, setMessages] = useState<Message[]>([{
-    id: "init", role: "assistant", content: "I am DhanRaksha, your Health Diagnostics AI Agent. Fill out the form to generate a unified financial health score, or ask me directly to formulate an emergency fund strategy."
+    id: "init", role: "assistant", content: "I am MoneyHealth, your Health Diagnostics AI Agent. Fill out the form to generate a unified financial health score, or ask me directly to formulate an emergency fund strategy."
   }])
   const [chatInput, setChatInput] = useState("")
   const [chatLoading, setChatLoading] = useState(false)

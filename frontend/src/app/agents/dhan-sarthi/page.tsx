@@ -17,26 +17,26 @@ interface Message {
 }
 
 const agentNames: Record<string, string> = {
-  niveshak: "📊 Niveshak",
-  karvid: "🧾 KarVid",
-  yojana: "🎯 YojanaKarta",
-  bazaar: "📈 BazaarGuru",
-  dhan: "💪 DhanRaksha",
-  vidhi: "⚖️ Vidhi",
-  "life-event": "🎉 Life Event",
-  "couple-planner": "💑 Couple's Planner",
+  "portfolio-wise": "📊 PortfolioWise",
+  "tax-master": "🧾 TaxMaster",
+  "retirement-pro": "🎯 RetirementPro",
+  "stock-insight": "📈 StockInsight",
+  "money-health": "💪 MoneyHealth",
+  "compliance-helper": "⚖️ ComplianceHelper",
+  "life-goals": "🎉 LifeGoals",
+  "partner-finance": "💑 PartnerFinance",
   "dhan-sarthi": "🧠 DhanSarthi",
 }
 
 const agentColorMap: Record<string, string> = {
-  niveshak: "from-blue-500/25 to-blue-600/15 border-blue-500/30",
-  karvid: "from-green-500/25 to-green-600/15 border-green-500/30",
-  yojana: "from-orange-500/25 to-orange-600/15 border-orange-500/30",
-  bazaar: "from-pink-500/25 to-pink-600/15 border-pink-500/30",
-  dhan: "from-red-500/25 to-red-600/15 border-red-500/30",
-  vidhi: "from-slate-400/25 to-slate-500/15 border-slate-400/30",
-  "life-event": "from-teal-500/25 to-teal-600/15 border-teal-500/30",
-  "couple-planner": "from-rose-400/25 to-rose-500/15 border-rose-400/30",
+  "portfolio-wise": "from-blue-500/25 to-blue-600/15 border-blue-500/30",
+  "tax-master": "from-green-500/25 to-green-600/15 border-green-500/30",
+  "retirement-pro": "from-orange-500/25 to-orange-600/15 border-orange-500/30",
+  "stock-insight": "from-pink-500/25 to-pink-600/15 border-pink-500/30",
+  "money-health": "from-red-500/25 to-red-600/15 border-red-500/30",
+  "compliance-helper": "from-slate-400/25 to-slate-500/15 border-slate-400/30",
+  "life-goals": "from-teal-500/25 to-teal-600/15 border-teal-500/30",
+  "partner-finance": "from-rose-400/25 to-rose-500/15 border-rose-400/30",
   "dhan-sarthi": "from-purple-500/25 to-indigo-600/15 border-purple-500/30",
 }
 
@@ -286,7 +286,7 @@ export default function DhanSarthiPage() {
                   {msg.role === 'assistant' && (
                     <div className="flex-shrink-0 mr-3 mt-1">
                       <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${agentColorMap[msg.agent || 'dhan-sarthi'] || agentColorMap['dhan-sarthi']} flex items-center justify-center text-xs border`}>
-                        {msg.agent === 'dhan-sarthi' ? '🧠' : msg.agent === 'karvid' ? '🧾' : msg.agent === 'yojana' ? '🎯' : msg.agent === 'bazaar' ? '📈' : msg.agent === 'niveshak' ? '📊' : msg.agent === 'dhan' ? '💪' : msg.agent === 'vidhi' ? '⚖️' : msg.agent === 'life-event' ? '🎉' : msg.agent === 'couple-planner' ? '💑' : '🤖'}
+                        {msg.agent === 'dhan-sarthi' ? '🧠' : msg.agent === 'tax-master' ? '🧾' : msg.agent === 'retirement-pro' ? '🎯' : msg.agent === 'stock-insight' ? '📈' : msg.agent === 'portfolio-wise' ? '📊' : msg.agent === 'money-health' ? '💪' : msg.agent === 'compliance-helper' ? '⚖️' : msg.agent === 'life-goals' ? '🎉' : msg.agent === 'partner-finance' ? '💑' : '🤖'}
                       </div>
                     </div>
                   )}

@@ -25,7 +25,7 @@ interface Message {
   content: string
 }
 
-export default function NiveshakPage() {
+export default function PortfolioWisePage() {
   const [holdings, setHoldings, hasLoaded] = useLocalStorage<Holding[]>("niveshak_holdings", [
     { name: "Parag Parikh Flexi Cap", units: 100, nav: 85.50, sipAmount: 5000, durationMonths: 12 }
   ])
@@ -36,7 +36,7 @@ export default function NiveshakPage() {
   const [messages, setMessages] = useState<Message[]>([{
     id: "init",
     role: "assistant",
-    content: "I am Niveshak, the AI Mutual Fund Analyzer. Add your holdings to the left and click 'Analyze Portfolio' to generate statistical insights, or ask me directly to explain your risk metrics and asset allocation!",
+    content: "I am PortfolioWise, the AI Mutual Fund Analyzer. Add your holdings to the left and click 'Analyze Portfolio' to generate statistical insights, or ask me directly to explain your risk metrics and asset allocation!",
   }])
   const [chatInput, setChatInput] = useState("")
   const [chatLoading, setChatLoading] = useState(false)
@@ -308,7 +308,7 @@ export default function NiveshakPage() {
         <div className="lg:sticky lg:top-6">
           <Card className="h-full flex flex-col border-blue-200/50 min-h-[600px] shadow-lg">
             <CardHeader className="bg-blue-50/50 border-b">
-              <CardTitle>Niveshak AI Consult</CardTitle>
+              <CardTitle>PortfolioWise Consult</CardTitle>
               <CardDescription>Chat directly with your portfolio analyzer</CardDescription>
             </CardHeader>
             <CardContent className="flex-1 flex flex-col p-0">
@@ -324,7 +324,7 @@ export default function NiveshakPage() {
                   <div className="flex justify-start">
                     <div className="bg-muted rounded-xl p-3 flex items-center gap-2">
                       <Loader2 className="w-4 h-4 animate-spin text-primary" />
-                      <span className="text-sm text-muted-foreground">Niveshak is reviewing...</span>
+                      <span className="text-sm text-muted-foreground">PortfolioWise is reviewing...</span>
                     </div>
                   </div>
                 )}

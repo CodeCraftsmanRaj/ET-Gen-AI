@@ -1,4 +1,4 @@
-"""Test YojanaKarta FIRE Planner"""
+"""Test RetirementPro FIRE Planner"""
 import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -73,13 +73,13 @@ def test_sip_recommendation():
 
 if __name__ == "__main__":
     print("\n" + "="*60)
-    print("TESTING YOJANAKARTA (FIRE Planner)")
+    print("TESTING RETIREMENT_PRO (FIRE Planner)")
     print("="*60)
     
     tests = [test_fire_number, test_years_to_fire, test_sip_roadmap, test_sip_recommendation]
     results = [t() for t in tests]
     
     if all(results):
-        print("\n✅ YOJANAKARTA: ALL TESTS PASSED")
+        print("\n✅ RETIREMENT_PRO: ALL TESTS PASSED")
     else:
-        print("\n❌ YOJANAKARTA: SOME TESTS FAILED")
+        print("\n❌ RETIREMENT_PRO: SOME TESTS FAILED")

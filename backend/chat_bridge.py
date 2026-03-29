@@ -1,11 +1,11 @@
 """
 AI Money Mentor - Chat Bridge
-Connects Frontend to OpenClaw Agent Swarm with Database Storage
-Uses OpenClaw CLI for agent communication
+Connects Frontend to FastAPI Backend with Database Storage
+Routes queries to appropriate agents
 """
 
 import sqlite3
-import subprocess
+import requests
 import json
 import os
 import uuid
@@ -18,6 +18,9 @@ from pydantic import BaseModel
 # Database setup - use project's data directory
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'chat_history.db')
 os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+
+# Backend API URL
+BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
 
 def init_db():
     """Initialize SQLite database for chat history"""
@@ -78,34 +81,63 @@ def get_chat_history(user_id: str, session_id: str, limit: int = 20) -> List[Dic
 
 def send_to_agent(agent_id: str, message: str, session_id: str = None) -> str:
     """
-    Send message to OpenClaw agent via CLI
+    Send message to backend agent via HTTP
     
-    Uses: openclaw agent --agent <agent_id> --message <message> --session-id <session_id>
+    Routes to appropriate agent endpoint based on agent_id
     """
-    session_key = f"frontend:{session_id}" if session_id else None
-    
     try:
-        cmd = ['openclaw', 'agent', '--agent', agent_id, '--message', message]
-        if session_key:
-            cmd.extend(['--session-id', session_key])
+        # Chat payloads are free-text. Use conversational endpoint for all agents.
+        # This avoids 422 errors from strict calculator endpoints that require structured numeric bodies.
+        endpoint = f"{BACKEND_URL}/ai/chat"
+
+        # Backward-compatible agent aliases expected by /ai/chat
+        ai_agent_alias = {
+            "dhan-sarthi": "dhansarthi",
+            "tax-master": "karvid",
+            "retirement-pro": "yojana",
+            "stock-insight": "bazaar",
+            "money-health": "dhan",
+            "compliance-helper": "vidhi",
+            "portfolio-wise": "niveshak",
+            "life-goals": "lifeevent",
+            "partner-finance": "coupleplanner",
+        }.get(agent_id, "dhansarthi")
+
+        payload = {
+            "message": message,
+            "agent": ai_agent_alias,
+        }
         
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=120  # 2 minute timeout
+        response = requests.post(
+            endpoint,
+            json=payload,
+            timeout=30
         )
         
-        if result.returncode != 0:
-            # Fallback: return error message
-            return f"[Agent {agent_id} error: {result.stderr.strip() or 'Unknown error'}]"
+        if response.status_code >= 400:
+            return f"[Agent {agent_id} error: Status {response.status_code}]"
         
         # Parse the response
-        response = result.stdout.strip()
-        return response if response else "[No response from agent]"
+        try:
+            data = response.json()
+            # Extract the response text from various possible response formats
+            if isinstance(data, dict):
+                if "response" in data:
+                    return data["response"]
+                elif "message" in data:
+                    return data["message"]
+                elif "result" in data:
+                    return str(data["result"])
+                else:
+                    return json.dumps(data, indent=2)
+            return str(data)
+        except:
+            return response.text
         
-    except subprocess.TimeoutExpired:
-        return f"[Agent {agent_id} timed out after 2 minutes]"
+    except requests.Timeout:
+        return f"[Agent {agent_id} timed out after 30 seconds]"
+    except requests.ConnectionError:
+        return f"[Cannot connect to agent {agent_id} - backend offline at {BACKEND_URL}]"
     except Exception as e:
         return f"[Error reaching {agent_id}: {str(e)}]"
 

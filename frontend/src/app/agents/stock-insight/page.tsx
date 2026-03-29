@@ -17,7 +17,7 @@ interface Message {
   content: string
 }
 
-export default function BazaarPage() {
+export default function StockInsightPage() {
   const [symbol, setSymbol, hasLoaded] = useLocalStorage("bazaar_symbol", "")
   
   const [loading, setLoading] = useState(false)
@@ -25,7 +25,7 @@ export default function BazaarPage() {
 
   // AI Chat state
   const [messages, setMessages] = useState<Message[]>([{
-    id: "init", role: "assistant", content: "I am BazaarGuru, your AI Stock Market Analyst. Search for a stock ticker to analyze its fundamentals, or ask me directly about market trends and technical indicators!"
+    id: "init", role: "assistant", content: "I am StockInsight, your AI Stock Market Analyst. Search for a stock ticker to analyze its fundamentals, or ask me directly about market trends and technical indicators!"
   }])
   const [chatInput, setChatInput] = useState("")
   const [chatLoading, setChatLoading] = useState(false)

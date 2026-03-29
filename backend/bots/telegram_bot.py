@@ -32,12 +32,12 @@ OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 # Bot Tokens (loaded from environment variables)
 BOT_TOKENS = {
     "dhansarthi": os.getenv("DHANSARTHI_BOT_TOKEN", ""),
-    "karvid": os.getenv("KARVID_BOT_TOKEN", ""),
-    "niveshak": os.getenv("NIVESHAK_BOT_TOKEN", ""),
-    "yojana": os.getenv("YOJANA_BOT_TOKEN", ""),
-    "bazaar": os.getenv("BAZAAR_BOT_TOKEN", ""),
-    "dhan": os.getenv("DHAN_BOT_TOKEN", ""),
-    "vidhi": os.getenv("VIDHI_BOT_TOKEN", ""),
+    "tax-master": os.getenv("KARVID_BOT_TOKEN", ""),
+    "portfolio-wise": os.getenv("NIVESHAK_BOT_TOKEN", ""),
+    "retirement-pro": os.getenv("YOJANA_BOT_TOKEN", ""),
+    "stock-insight": os.getenv("BAZAAR_BOT_TOKEN", ""),
+    "money-health": os.getenv("DHAN_BOT_TOKEN", ""),
+    "compliance-helper": os.getenv("VIDHI_BOT_TOKEN", ""),
     "lifeevent": os.getenv("LIFEEVENT_BOT_TOKEN", ""),
     "coupleplanner": os.getenv("COUPLEPLANNER_BOT_TOKEN", ""),
 }
@@ -64,36 +64,36 @@ Available Agents (8 Specialists):
 
 Be helpful, friendly, and knowledgeable about Indian finance.""",
 
-    "karvid": """You are KarVid, the Tax Wizard for Indian tax calculations.
+    "tax-master": """You are KarVid, the Tax Wizard for Indian tax calculations.
 You help users understand and calculate their taxes under both old and new regimes.
 You explain deductions, capital gains, and tax optimization strategies.
 Always include SEBI disclaimer when giving tax advice.
 Be conversational and help users save taxes legally.""",
 
-    "niveshak": """You are Niveshak, the Mutual Fund Portfolio Analyst.
+    "portfolio-wise": """You are Niveshak, the Mutual Fund Portfolio Analyst.
 You help users analyze their mutual fund portfolios, calculate XIRR, and understand risk metrics.
 You can parse CAS statements and provide portfolio recommendations.
 Explain Sharpe ratio, Sortino ratio, and CAGR in simple terms.
 Always include SEBI disclaimer when suggesting investments.""",
 
-    "yojana": """You are YojanaKarta, the FIRE Planner.
+    "retirement-pro": """You are YojanaKarta, the FIRE Planner.
 You help users plan their financial independence and early retirement.
 Calculate FIRE numbers, suggest SIP strategies, and create retirement roadmaps.
 Explain the 4% rule and how compounding works.
 Be encouraging and help users set realistic goals.""",
 
-    "bazaar": """You are BazaarGuru, the Market Researcher.
+    "stock-insight": """You are BazaarGuru, the Market Researcher.
 You provide stock prices, market analysis, and company information for NSE/BSE stocks.
 Explain technical indicators and market trends in simple terms.
 Always include SEBI disclaimer - this is NOT investment advice.
 Be informative but cautious about making predictions.""",
 
-    "dhan": """You are DhanRaksha, the Financial Health Expert.
+    "money-health": """You are DhanRaksha, the Financial Health Expert.
 You assess users financial health based on 8 factors: emergency fund, savings rate, debt-to-income, etc.
 Provide personalized recommendations to improve financial health.
 Be supportive and help users build better financial habits.""",
 
-    "vidhi": """You are Vidhi, the Legal and Compliance Expert.
+    "compliance-helper": """You are Vidhi, the Legal and Compliance Expert.
 You help users understand SEBI regulations, mutual fund disclaimers, and investor rights.
 Provide compliance information and legal knowledge about Indian finance.
 Be precise and always recommend consulting a professional for specific legal advice.""",
@@ -190,12 +190,12 @@ async def handle_start(update: Update, context: ContextTypes.DEFAULT_TYPE, agent
     """Handle /start command"""
     agent_names = {
         "dhansarthi": "DhanSarthi",
-        "karvid": "KarVid - Tax Wizard",
-        "niveshak": "Niveshak - MF Analyst",
-        "yojana": "YojanaKarta - FIRE Planner",
-        "bazaar": "BazaarGuru - Market Research",
-        "dhan": "DhanRaksha - Health Expert",
-        "vidhi": "Vidhi - Compliance",
+        "tax-master": "KarVid - Tax Wizard",
+        "portfolio-wise": "Niveshak - MF Analyst",
+        "retirement-pro": "YojanaKarta - FIRE Planner",
+        "stock-insight": "BazaarGuru - Market Research",
+        "money-health": "DhanRaksha - Health Expert",
+        "compliance-helper": "Vidhi - Compliance",
         "lifeevent": "JeevanSarthi - Life Event Advisor",
         "coupleplanner": "CoupleSathi - Couple Planner",
     }

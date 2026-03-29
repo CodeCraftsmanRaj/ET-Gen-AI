@@ -18,7 +18,7 @@ interface Message {
   content: string
 }
 
-export default function YojanaPage() {
+export default function RetirementProPage() {
   const [formData, setFormData, hasLoaded] = useLocalStorage("yojana_form", {
     monthlyExpenses: 50000,
     currentAge: 30,
@@ -33,7 +33,7 @@ export default function YojanaPage() {
 
   // AI Chat state
   const [messages, setMessages] = useState<Message[]>([{
-    id: "init", role: "assistant", content: "I am YojanaKarta, your FIRE (Financial Independence, Retire Early) Planner. Fill out your details below to calculate your target corpus, or chat with me to explore investment strategies like Index Funds vs Real Estate!"
+    id: "init", role: "assistant", content: "I am RetirementPro, your FIRE (Financial Independence, Retire Early) Planner. Fill out your details below to calculate your target corpus, or chat with me to explore investment strategies like Index Funds vs Real Estate!"
   }])
   const [chatInput, setChatInput] = useState("")
   const [chatLoading, setChatLoading] = useState(false)

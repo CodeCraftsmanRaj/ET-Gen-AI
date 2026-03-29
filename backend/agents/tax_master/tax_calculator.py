@@ -18,21 +18,21 @@ from datetime import datetime
 import json
 
 # Import local modules
-from agents.karvid.tax_brackets import (
+from agents.tax_master.tax_brackets import (
     calculate_new_regime_tax,
     calculate_old_regime_tax,
     compare_regimes,
     NEW_REGIME_SLABS_FY2025_26,
     OLD_REGIME_SLABS_FY2025_26,
 )
-from agents.karvid.deductions import (
+from agents.tax_master.deductions import (
     calculate_80c_deduction,
     calculate_80d_deduction,
     calculate_hra_exemption,
     calculate_80ccd_deduction,
     calculate_total_deductions,
 )
-from agents.karvid.capital_gains import (
+from agents.tax_master.capital_gains import (
     calculate_capital_gains,
     calculate_section_54_exemption,
     CapitalGainsResult,

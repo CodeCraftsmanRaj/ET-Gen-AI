@@ -20,15 +20,15 @@ export const frontendApi = axios.create({
 // Tax Calculator API
 export const karvidApi = {
   calculateTax: async (data: any) => {
-    const response = await backendApi.post('/karvid/calculate-tax', data)
+    const response = await backendApi.post('/tax-master/calculate-tax', data)
     return response.data
   },
   compareRegimes: async (data: any) => {
-    const response = await backendApi.post('/karvid/compare-regimes', data)
+    const response = await backendApi.post('/tax-master/compare-regimes', data)
     return response.data
   },
   getSection: async (sectionId: string) => {
-    const response = await backendApi.get(`/karvid/section/${sectionId}`)
+    const response = await backendApi.get(`/tax-master/section/${sectionId}`)
     return response.data
   },
 }
@@ -36,7 +36,7 @@ export const karvidApi = {
 // FIRE Planner API
 export const yojanaApi = {
   calculateFIRE: async (data: any) => {
-    const response = await backendApi.post('/yojana/fire-number', data)
+    const response = await backendApi.post('/retirement-pro/fire-number', data)
     return response.data
   },
 }
@@ -44,7 +44,7 @@ export const yojanaApi = {
 // Stock Quotes API
 export const bazaarApi = {
   getStockQuote: async (data: any) => {
-    const response = await backendApi.post('/bazaar/stock-quote', data)
+    const response = await backendApi.post('/stock-insight/stock-quote', data)
     return response.data
   },
 }
@@ -52,7 +52,7 @@ export const bazaarApi = {
 // Health Score API
 export const dhanApi = {
   calculateHealthScore: async (data: any) => {
-    const response = await backendApi.post('/dhan/health-score', data)
+    const response = await backendApi.post('/money-health/health-score', data)
     return response.data
   },
 }
@@ -60,11 +60,11 @@ export const dhanApi = {
 // MF Portfolio API
 export const niveshakApi = {
   calculateXIRR: async (data: any) => {
-    const response = await backendApi.post('/niveshak/xirr', data)
+    const response = await backendApi.post('/portfolio-wise/xirr', data)
     return response.data
   },
   analyzePortfolio: async (data: any) => {
-    const response = await backendApi.post('/niveshak/analyze', data)
+    const response = await backendApi.post('/portfolio-wise/analyze', data)
     return response.data
   },
 }
@@ -72,11 +72,11 @@ export const niveshakApi = {
 // Life Event API
 export const lifeEventApi = {
   planEvent: async (data: any) => {
-    const response = await backendApi.post('/life-event/plan', data)
+    const response = await backendApi.post('/life-goals/plan', data)
     return response.data
   },
   getEventTypes: async () => {
-    const response = await backendApi.get('/life-event/types')
+    const response = await backendApi.get('/life-goals/types')
     return response.data
   },
 }
@@ -84,11 +84,11 @@ export const lifeEventApi = {
 // Couple Planner API
 export const couplePlannerApi = {
   planFinances: async (data: any) => {
-    const response = await backendApi.post('/couple/finances', data)
+    const response = await backendApi.post('/partner-finance/finances', data)
     return response.data
   },
   splitExpense: async (data: any) => {
-    const response = await backendApi.post('/couple/split-expense', data)
+    const response = await backendApi.post('/partner-finance/split-expense', data)
     return response.data
   },
 }
@@ -96,7 +96,7 @@ export const couplePlannerApi = {
 // Compliance API
 export const vidhiApi = {
   getDisclaimers: async () => {
-    const response = await backendApi.get('/vidhi/disclaimers')
+    const response = await backendApi.get('/compliance-helper/disclaimers')
     return response.data
   },
 }

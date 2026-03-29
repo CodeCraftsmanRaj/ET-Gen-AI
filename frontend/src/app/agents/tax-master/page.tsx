@@ -19,8 +19,8 @@ interface Message {
   content: string
 }
 
-export default function KarVidPage() {
-  const [formData, setFormData, hasLoaded] = useLocalStorage("karvid_form", {
+export default function TaxMasterPage() {
+  const [formData, setFormData, hasLoaded] = useLocalStorage("tax_master_form", {
     grossIncome: 1200000,
     deductions80C: 150000,
     deductions80D: 25000,
@@ -35,7 +35,7 @@ export default function KarVidPage() {
 
   // AI Chat state
   const [messages, setMessages] = useState<Message[]>([{
-    id: "init", role: "assistant", content: "I am KarVid, your AI Tax Advisor. Input your numbers in the form to generate a unified tax breakdown, or ask me directly about tax sections, exemptions, and capital gains!"
+    id: "init", role: "assistant", content: "I am TaxMaster, your AI Tax Advisor. Input your numbers in the form to generate a unified tax breakdown, or ask me directly about tax sections, exemptions, and capital gains!"
   }])
   const [chatInput, setChatInput] = useState("")
   const [chatLoading, setChatLoading] = useState(false)
@@ -67,7 +67,7 @@ export default function KarVidPage() {
         body: JSON.stringify({
           message: query,
           user_id: userId,
-          agent_id: "karvid"
+          agent_id: "tax-master"
         }),
       })
 
@@ -99,7 +99,7 @@ export default function KarVidPage() {
   const calculateTax = async () => {
     setCalculating(true)
     try {
-      const response = await fetch("/api/karvid", {
+      const response = await fetch("/api/tax-master", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -179,7 +179,7 @@ export default function KarVidPage() {
     <div className="container mx-auto p-6">
       <div className="mb-8">
         <h1 className="text-3xl font-bold flex items-center gap-3">
-          🧾 KarVid
+          🧾 TaxMaster
           <Badge className="bg-green-500 hover:bg-green-600 text-white border-0">AI Agent Active</Badge>
         </h1>
         <p className="text-muted-foreground mt-2">
@@ -249,7 +249,7 @@ export default function KarVidPage() {
                       {result.savings > 0 && (
                         <div className={`p-4 rounded-lg flex items-center gap-3 ${result.recommendation === 'new' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}`}>
                           <Badge className={result.recommendation === 'new' ? 'bg-green-600' : 'bg-blue-600'}>
-                            KARVID RECOMMENDS
+                            TAXMASTER RECOMMENDS
                           </Badge>
                           <span className="font-semibold text-sm">
                             Switching to the {result.recommendation.toUpperCase()} regime saves you {formatCurrency(result.savings)}.
@@ -293,7 +293,7 @@ export default function KarVidPage() {
         <div className="lg:sticky lg:top-6">
           <Card className="h-full flex flex-col border-green-200/50 min-h-[600px] shadow-lg">
             <CardHeader className="bg-green-50/50 border-b">
-              <CardTitle>KarVid Consult</CardTitle>
+              <CardTitle>TaxMaster Consult</CardTitle>
               <CardDescription>Chat directly with the Indian Tax Agent</CardDescription>
             </CardHeader>
             <CardContent className="flex-1 flex flex-col p-0">
@@ -309,7 +309,7 @@ export default function KarVidPage() {
                   <div className="flex justify-start">
                     <div className="bg-muted rounded-xl p-3 flex items-center gap-2">
                       <Loader2 className="w-4 h-4 animate-spin text-primary" />
-                      <span className="text-sm text-muted-foreground">KarVid is cross-referencing law...</span>
+                      <span className="text-sm text-muted-foreground">TaxMaster is cross-referencing law...</span>
                     </div>
                   </div>
                 )}

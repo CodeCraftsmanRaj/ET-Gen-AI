@@ -15,7 +15,7 @@ interface Message {
   content: string
 }
 
-export default function VidhiPage() {
+export default function ComplianceHelperPage() {
   const [disclaimers, setDisclaimers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -23,7 +23,7 @@ export default function VidhiPage() {
   const [messages, setMessages] = useState<Message[]>([{
     id: "init",
     role: "assistant",
-    content: "I am Vidhi, the Legal & Compliance agent. Do you have any questions regarding SEBI regulations, investor rights, or regulatory compliance?",
+    content: "I am ComplianceHelper, the Legal & Compliance agent. Do you have any questions regarding SEBI regulations, investor rights, or regulatory compliance?",
   }])
   const [input, setInput] = useState("")
   const [chatLoading, setChatLoading] = useState(false)
