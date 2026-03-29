@@ -20,7 +20,7 @@ DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'chat
 os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
 
 # Backend API URL
-BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
+BACKEND_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:8000")
 
 def init_db():
     """Initialize SQLite database for chat history"""
@@ -93,14 +93,14 @@ def send_to_agent(agent_id: str, message: str, session_id: str = None) -> str:
         # Backward-compatible agent aliases expected by /ai/chat
         ai_agent_alias = {
             "dhan-sarthi": "dhansarthi",
-            "tax-master": "karvid",
-            "retirement-pro": "yojana",
-            "stock-insight": "bazaar",
-            "money-health": "dhan",
-            "compliance-helper": "vidhi",
-            "portfolio-wise": "niveshak",
-            "life-goals": "lifeevent",
-            "partner-finance": "coupleplanner",
+            "tax-master": "tax-master",
+            "retirement-pro": "retirement-pro",
+            "stock-insight": "stock-insight",
+            "money-health": "money-health",
+            "compliance-helper": "compliance-helper",
+            "portfolio-wise": "portfolio-wise",
+            "life-goals": "life-goals",
+            "partner-finance": "partner-finance",
         }.get(agent_id, "dhansarthi")
 
         payload = {
@@ -111,7 +111,7 @@ def send_to_agent(agent_id: str, message: str, session_id: str = None) -> str:
         response = requests.post(
             endpoint,
             json=payload,
-            timeout=30
+            timeout=65
         )
         
         if response.status_code >= 400:
@@ -135,7 +135,7 @@ def send_to_agent(agent_id: str, message: str, session_id: str = None) -> str:
             return response.text
         
     except requests.Timeout:
-        return f"[Agent {agent_id} timed out after 30 seconds]"
+        return f"[Agent {agent_id} timed out after 65 seconds]"
     except requests.ConnectionError:
         return f"[Cannot connect to agent {agent_id} - backend offline at {BACKEND_URL}]"
     except Exception as e:
