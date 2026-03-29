@@ -5,21 +5,8 @@ const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8000'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const action = body.action || 'finances'
 
-    // Map actions to backend endpoints
-    const endpointMap: Record<string, string> = {
-      'finances': '/couple/finances',
-      'split-expense': '/couple/split-expense',
-      'plan': '/couple/plan',
-      'budget': '/couple/budget',
-      'goals': '/couple/goals',
-      'debt-payoff': '/couple/debt-payoff',
-    }
-
-    const endpoint = endpointMap[action] || '/couple/finances'
-
-    const response = await fetch(`${BACKEND_URL}${endpoint}`, {
+    const response = await fetch(`${BACKEND_URL}/life-goals/plan`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -36,7 +23,32 @@ export async function POST(request: NextRequest) {
     const data = await response.json()
     return NextResponse.json(data)
   } catch (error: any) {
-    console.error('Couple Planner API Error:', error)
+    console.error('Life Event API Error:', error)
+    return NextResponse.json(
+      { error: 'Backend is offline. Please ensure the FastAPI server is running on port 8000.' },
+      { status: 503 }
+    )
+  }
+}
+
+export async function GET() {
+  try {
+    const response = await fetch(`${BACKEND_URL}/life-goals/types`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    })
+
+    if (!response.ok) {
+      return NextResponse.json(
+        { error: 'Backend returned an error', status: response.status },
+        { status: response.status }
+      )
+    }
+
+    const data = await response.json()
+    return NextResponse.json(data)
+  } catch (error: any) {
+    console.error('Life Event API Error:', error)
     return NextResponse.json(
       { error: 'Backend is offline. Please ensure the FastAPI server is running on port 8000.' },
       { status: 503 }

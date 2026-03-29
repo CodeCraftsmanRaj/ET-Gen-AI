@@ -1,5 +1,5 @@
 """
-KarVid - Tax Wizard Agent
+TaxMaster - Tax Wizard Agent
 Indian tax calculations and deductions
 """
 

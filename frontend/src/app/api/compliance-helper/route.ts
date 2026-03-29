@@ -1,15 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8000'
 
-export async function POST(request: NextRequest) {
+export async function GET() {
   try {
-    const body = await request.json()
-
-    const response = await fetch(`${BACKEND_URL}/karvid/calculate-tax`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+    const response = await fetch(`${BACKEND_URL}/compliance-helper/disclaimers`, {
+      method: 'GET',
     })
 
     if (!response.ok) {

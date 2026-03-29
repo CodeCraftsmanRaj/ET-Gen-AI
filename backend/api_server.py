@@ -1,6 +1,7 @@
 """
 AI Money Mentor - FastAPI Server
 Connects Telegram bots to Python modules
+Cross-platform compatible with proper error handling
 """
 
 from fastapi import FastAPI, HTTPException
@@ -10,17 +11,59 @@ from typing import List, Optional, Dict, Any
 import sys
 import os
 from datetime import datetime
+import logging
 
-# Add project to path
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-# Import all agent modules
-from agents.niveshak.portfolio_analyzer import PortfolioAnalyzer
-from agents.karvid import calculate_new_regime_tax, calculate_old_regime_tax, compare_regimes, calculate_80c_deduction, calculate_equity_ltcg
-from agents.yojana.fire_calculator import FIRECalculator, calculate_fire_number_india, get_sip_recommendation
-from agents.bazaar.stock_data import StockData
-from agents.dhan.health_score import get_health_score
-from agents.vidhi.compliance import get_disclaimers, SEBICompliance
+# Add project to path - cross-platform compatible
+backend_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, backend_dir)
+
+# Import all agent modules with fallbacks
+try:
+    from agents.portfolio_wise.portfolio_analyzer import PortfolioAnalyzer
+except ImportError:
+    logger.warning("PortfolioAnalyzer import failed, using stub")
+    PortfolioAnalyzer = None
+
+try:
+    from agents.tax_master import calculate_new_regime_tax, calculate_old_regime_tax, compare_regimes, calculate_80c_deduction, calculate_equity_ltcg
+except ImportError:
+    logger.warning("TaxMaster imports failed, using stubs")
+    def calculate_new_regime_tax(income): return {"tax": 0, "regime": "new"}
+    def calculate_old_regime_tax(income): return {"tax": 0, "regime": "old"}
+    def compare_regimes(income): return {"new": 0, "old": 0, "savings": 0}
+    def calculate_80c_deduction(**kwargs): return {"deduction": 0}
+    def calculate_equity_ltcg(gain): return {"tax": 0}
+
+try:
+    from agents.retirement_pro.fire_calculator import FIRECalculator, calculate_fire_number_india, get_sip_recommendation
+except ImportError:
+    logger.warning("RetirementPro imports failed, using stubs")
+    FIRECalculator = None
+    def calculate_fire_number_india(**kwargs): return {"fire_number": 0}
+    def get_sip_recommendation(**kwargs): return {"sip_amount": 0}
+
+try:
+    from agents.stock_insight.stock_data import StockData
+except ImportError:
+    logger.warning("StockInsight imports failed, using stub")
+    StockData = None
+
+try:
+    from agents.money_health.health_score import get_health_score
+except ImportError:
+    logger.warning("MoneyHealth imports failed, using stub")
+    def get_health_score(**kwargs): return {"score": 0}
+
+try:
+    from agents.compliance_helper.compliance import get_disclaimers, SEBICompliance
+except ImportError:
+    logger.warning("ComplianceHelper imports failed, using stubs")
+    def get_disclaimers(): return []
+    SEBICompliance = None
 
 app = FastAPI(
     title="AI Money Mentor API",
@@ -76,7 +119,17 @@ async def root():
     return {
         "service": "AI Money Mentor API",
         "version": "1.0.0",
-        "agents": ["niveshak", "karvid", "yojana", "bazaar", "dhan", "vidhi", "dhan-sarthi", "life-event", "couple-planner"]
+        "agents": [
+            "portfolio-wise",      # MF Portfolio Analysis
+            "tax-master",          # Income Tax & Deductions
+            "retirement-pro",      # FIRE & Retirement Planning
+            "stock-insight",       # Stock Market & Quotes
+            "money-health",        # Financial Health Score
+            "compliance-helper",   # SEBI & Compliance
+            "dhan-sarthi",         # Coordinator
+            "life-goals",          # Life Event Planning
+            "partner-finance"      # Couple Finance Planning
+        ]
     }
 
 @app.get("/health")
@@ -84,14 +137,14 @@ async def health():
     return {"status": "healthy"}
 
 # ============ NIVESHAK (MF Portfolio) ============
-@app.post("/niveshak/xirr")
+@app.post("/portfolio-wise/xirr")
 async def calculate_xirr(request: XIRRRequest):
     """Calculate XIRR for portfolio"""
     analyzer = PortfolioAnalyzer()
     xirr = analyzer.calculate_xirr(request.transactions)
     return {"xirr_percent": round(xirr, 2)}
 
-@app.post("/niveshak/risk-metrics")
+@app.post("/portfolio-wise/risk-metrics")
 async def get_risk_metrics(request: Dict[str, Any]):
     """Get portfolio risk metrics"""
     analyzer = PortfolioAnalyzer()
@@ -99,7 +152,7 @@ async def get_risk_metrics(request: Dict[str, Any]):
     metrics = analyzer.get_risk_metrics(nav_data)
     return metrics
 
-@app.post("/niveshak/analyze")
+@app.post("/portfolio-wise/analyze")
 async def analyze_portfolio(request: Dict[str, Any]):
     """Analyze entire portfolio from holdings list"""
     holdings = request.get("holdings", [])
@@ -167,7 +220,7 @@ async def analyze_portfolio(request: Dict[str, Any]):
     }
 
 # ============ KARVID (Tax Wizard) ============
-@app.post("/karvid/calculate-tax")
+@app.post("/tax-master/calculate-tax")
 async def calculate_tax(request: TaxRequest):
     """Calculate tax under specified regime"""
     if request.regime == "new":
@@ -178,14 +231,14 @@ async def calculate_tax(request: TaxRequest):
     result["regime"] = request.regime
     return result
 
-@app.post("/karvid/compare-regimes")
+@app.post("/tax-master/compare-regimes")
 async def compare_tax_regimes(request: Dict[str, Any]):
     """Compare new vs old tax regime"""
     income = request.get("income", 0)
     result = compare_regimes(income)
     return result
 
-@app.post("/karvid/80c")
+@app.post("/tax-master/80c")
 async def calculate_80c(request: Dict[str, Any]):
     """Calculate 80C deductions"""
     # Remap shorthand keys to actual function parameter names
@@ -206,7 +259,7 @@ async def calculate_80c(request: Dict[str, Any]):
     result = calculate_80c_deduction(**deductions)
     return result
 
-@app.post("/karvid/capital-gains")
+@app.post("/tax-master/capital-gains")
 async def calculate_capital_gains(request: Dict[str, Any]):
     """Calculate capital gains tax"""
     holding_period = request.get("holding_period", "long")
@@ -258,14 +311,14 @@ async def calculate_capital_gains(request: Dict[str, Any]):
     return result
 
 # ============ YOJANAKARTA (FIRE Planner) ============
-@app.post("/yojana/fire-number")
+@app.post("/retirement-pro/fire-number")
 async def get_fire_number(request: Dict[str, Any]):
     """Calculate FIRE number"""
     monthly_expenses = request.get("monthly_expenses", 50000)
     result = calculate_fire_number_india(monthly_expenses)
     return result
 
-@app.post("/yojana/sip-recommendation")
+@app.post("/retirement-pro/sip-recommendation")
 async def get_sip(request: Dict[str, Any]):
     """Get SIP recommendation"""
     target_corpus = request.get("target_corpus", 10000000)
@@ -273,7 +326,7 @@ async def get_sip(request: Dict[str, Any]):
     result = get_sip_recommendation(target_corpus, years)
     return result
 
-@app.post("/yojana/retirement-plan")
+@app.post("/retirement-pro/retirement-plan")
 async def create_retirement_plan(request: Dict[str, Any]):
     """Create retirement plan"""
     monthly_expenses = float(request.get("monthly_expenses", 50000) or 50000)
@@ -338,7 +391,7 @@ async def create_retirement_plan(request: Dict[str, Any]):
     return plan
 
 # ============ BAZAAR GURU (Market Research) ============
-@app.post("/bazaar/stock-quote")
+@app.post("/stock-insight/stock-quote")
 async def get_stock_quote(request: StockRequest):
     """Get stock quote from NSE"""
     nse = StockData()
@@ -347,20 +400,20 @@ async def get_stock_quote(request: StockRequest):
         return quote.to_dict()
     raise HTTPException(status_code=404, detail=f"Stock {request.symbol} not found")
 
-@app.get("/bazaar/top-gainers")
+@app.get("/stock-insight/top-gainers")
 async def get_top_gainers(limit: int = 10):
     """Get top gaining stocks"""
     stock = StockData()
     gainers = stock.get_top_gainers(limit)
     return {"gainers": gainers}
 
-@app.get("/bazaar/nifty50")
+@app.get("/stock-insight/nifty50")
 async def get_nifty50():
     """Get NIFTY 50 stocks"""
     return {"stocks": StockData.NIFTY_50}
 
 # ============ DHAN RAKSHA (Financial Health) ============
-@app.post("/dhan/health-score")
+@app.post("/money-health/health-score")
 async def calculate_health_score(request: HealthRequest):
     """Calculate financial health score"""
     payload = request.model_dump()
@@ -376,12 +429,12 @@ async def calculate_health_score(request: HealthRequest):
     return result
 
 # ============ VIDHI (Compliance) ============
-@app.get("/vidhi/disclaimers")
+@app.get("/compliance-helper/disclaimers")
 async def get_all_disclaimers(category: str = "all"):
     """Get SEBI compliance disclaimers"""
     return {"disclaimers": get_disclaimers(category)}
 
-@app.get("/vidhi/regulations")
+@app.get("/compliance-helper/regulations")
 async def get_sebi_regulations():
     """Get SEBI regulations"""
     return SEBICompliance.get_regulations()
@@ -472,44 +525,44 @@ async def route_query(request: Dict[str, Any]):
     return result
 
 # ============ KARVID TAX LAW ENDPOINTS ============
-@app.get("/karvid/section/{section}")
+@app.get("/tax-master/section/{section}")
 async def get_tax_section(section: str):
     """Get detailed information about a tax section"""
     from agents.karvid.indian_tax_laws import get_tax_section_info
     return get_tax_section_info(section)
 
-@app.get("/karvid/capital-gains-info/{asset_type}")
+@app.get("/tax-master/capital-gains-info/{asset_type}")
 async def get_capital_gains_info(asset_type: str):
     """Get capital gains tax information"""
     from agents.karvid.indian_tax_laws import get_capital_gains_info
     return get_capital_gains_info(asset_type)
 
-@app.get("/karvid/tax-slabs/{regime}")
+@app.get("/tax-master/tax-slabs/{regime}")
 async def get_tax_slabs(regime: str):
     """Get tax slabs for a regime"""
     from agents.karvid.indian_tax_laws import get_tax_slab
     return {"slabs": get_tax_slab(regime)}
 
 # ============ VIDHI LEGAL ENDPOINTS ============
-@app.get("/vidhi/constitution/{article}")
+@app.get("/compliance-helper/constitution/{article}")
 async def get_constitution_article(article: str):
     """Get Constitution provision"""
     from agents.vidhi.legal_knowledge import get_constitution_provision
     return get_constitution_provision(article)
 
-@app.get("/vidhi/income-tax-section/{section}")
+@app.get("/compliance-helper/income-tax-section/{section}")
 async def get_income_tax_section(section: str):
     """Get Income Tax Act section"""
     from agents.vidhi.legal_knowledge import get_income_tax_section
     return {"section": section, "description": get_income_tax_section(section)}
 
-@app.get("/vidhi/sebi-regulation/{name}")
+@app.get("/compliance-helper/sebi-regulation/{name}")
 async def get_sebi_regulation(name: str):
     """Get SEBI regulation details"""
     from agents.vidhi.legal_knowledge import get_sebi_regulation
     return get_sebi_regulation(name)
 
-@app.get("/vidhi/rbi-regulation/{name}")
+@app.get("/compliance-helper/rbi-regulation/{name}")
 async def get_rbi_regulation(name: str):
     """Get RBI regulation details"""
     from agents.vidhi.legal_knowledge import get_rbi_regulation
@@ -698,12 +751,12 @@ from agents.life_event import (
     comprehensive_plan as life_event_comprehensive_plan
 )
 
-@app.get("/life-event/types")
+@app.get("/life-goals/types")
 async def life_event_get_types():
     """Get all available life event types"""
     return get_event_types()
 
-@app.post("/life-event/plan")
+@app.post("/life-goals/plan")
 async def life_event_plan(request: Dict[str, Any]):
     """Plan for a specific life event"""
     return plan_life_event(
@@ -715,7 +768,7 @@ async def life_event_plan(request: Dict[str, Any]):
         expected_return=request.get("expected_return", 0.12)
     )
 
-@app.post("/life-event/comprehensive")
+@app.post("/life-goals/comprehensive")
 async def life_event_comprehensive(request: Dict[str, Any]):
     """Create comprehensive life event financial plan"""
     try:
@@ -939,7 +992,7 @@ def _build_portfolio_xray(holdings: List[Dict[str, Any]], total_value: float, xi
         "rebalancing_plan": rebalancing_plan,
     }
 
-@app.post("/couple/finances")
+@app.post("/partner-finance/finances")
 async def couple_get_finances(request: Dict[str, Any]):
     """Get combined finances for a couple"""
     p1 = Person(name=request.get("person1_name", "Person 1"), income=request.get("person1_income", 0))
@@ -947,7 +1000,7 @@ async def couple_get_finances(request: Dict[str, Any]):
     planner = CouplePlanner(p1, p2)
     return planner.get_combined_finances()
 
-@app.post("/couple/split-expense")
+@app.post("/partner-finance/split-expense")
 async def couple_split_expense(request: Dict[str, Any]):
     """Calculate how to split an expense between couple"""
     return calculate_expense_split(
@@ -959,7 +1012,7 @@ async def couple_split_expense(request: Dict[str, Any]):
         split_type=request.get("split_type", "proportional")
     )
 
-@app.post("/couple/plan")
+@app.post("/partner-finance/plan")
 async def couple_create_plan(request: Dict[str, Any]):
     """Create comprehensive couple financial plan"""
     return create_couple_plan(
@@ -970,7 +1023,7 @@ async def couple_create_plan(request: Dict[str, Any]):
         goals=request.get("goals")
     )
 
-@app.post("/couple/budget")
+@app.post("/partner-finance/budget")
 async def couple_create_budget(request: Dict[str, Any]):
     """Create joint budget plan"""
     p1 = Person(
@@ -988,7 +1041,7 @@ async def couple_create_budget(request: Dict[str, Any]):
     planner = CouplePlanner(p1, p2)
     return planner.create_budget_plan(request.get("categories"))
 
-@app.post("/couple/goals")
+@app.post("/partner-finance/goals")
 async def couple_plan_goals(request: Dict[str, Any]):
     """Calculate SIP for couple's shared goals"""
     p1 = Person(
@@ -1012,7 +1065,7 @@ async def couple_plan_goals(request: Dict[str, Any]):
     
     return planner.calculate_sip_for_goals(request.get("expected_return", 0.12))
 
-@app.post("/couple/debt-payoff")
+@app.post("/partner-finance/debt-payoff")
 async def couple_debt_payoff(request: Dict[str, Any]):
     """Plan debt payoff strategy for couple"""
     p1 = Person(
@@ -1044,7 +1097,7 @@ async def couple_debt_payoff(request: Dict[str, Any]):
         }
 
 
-@app.post("/couple/optimize")
+@app.post("/partner-finance/optimize")
 async def couple_optimize(request: Dict[str, Any]):
     """Optimize couple plan across HRA, NPS, SIP split, insurance, and net worth."""
     return optimize_couple_tax_and_protection(

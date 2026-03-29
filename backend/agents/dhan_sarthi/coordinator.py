@@ -13,14 +13,14 @@ import requests
 class AgentType(Enum):
     """Available specialist agents"""
     DHAN_SARTHI = "dhan-sarthi" # Coordinator/Greeting/Generic
-    NIVESHAK = "niveshak"       # MF Portfolio X-Ray
-    KARVID = "karvid"           # Tax Wizard
-    YOJANAKARTA = "yojana"      # FIRE Planner
-    BAZAAR_GURU = "bazaar"      # Market Research
-    DHAN_RAKSHA = "dhan"        # Financial Health
-    VIDHI = "vidhi"             # Legal/Compliance
-    LIFE_EVENT = "life-event"   # Life Event Planner
-    COUPLE_PLANNER = "couple-planner"  # Couple Finance
+    PORTFOLIO_WISE = "portfolio-wise"       # MF Portfolio X-Ray
+    TAX_MASTER = "tax-master"           # Tax Wizard
+    RETIREMENT_PRO = "retirement-pro"      # FIRE Planner
+    STOCK_INSIGHT = "stock-insight"      # Market Research
+    MONEY_HEALTH = "money-health"        # Financial Health
+    COMPLIANCE_HELPER = "compliance-helper"             # Legal/Compliance
+    LIFE_GOALS = "life-goals"   # Life Event Planner
+    PARTNER_FINANCE = "partner-finance"  # Couple Finance
 
 
 @dataclass
@@ -96,9 +96,9 @@ class DhanSarthiCoordinator:
             can_delegate=False,
             api_endpoint="/dhan-sarthi/route"
         ),
-        AgentType.NIVESHAK: AgentCapability(
-            name="Niveshak",
-            agent_type=AgentType.NIVESHAK,
+        AgentType.PORTFOLIO_WISE: AgentCapability(
+            name="PortfolioWise",
+            agent_type=AgentType.PORTFOLIO_WISE,
             description="Mutual Fund Portfolio Analyst - CAS parsing, XIRR, Sharpe ratio, portfolio analysis, risk metrics",
             keywords=["mf", "mutual fund", "portfolio", "cas", "xirr", "nav", "sip", "cagr", "sharpe", 
                      "sortino", "holding", "scheme", "fund", "investment", "returns", "risk"],
@@ -110,11 +110,11 @@ class DhanSarthiCoordinator:
                 "Which funds should I redeem?",
             ],
             confidence_threshold=0.6,
-            api_endpoint="/niveshak/xirr"
+            api_endpoint="/portfolio-wise/xirr"
         ),
-        AgentType.KARVID: AgentCapability(
-            name="KarVid",
-            agent_type=AgentType.KARVID,
+        AgentType.TAX_MASTER: AgentCapability(
+            name="TaxMaster",
+            agent_type=AgentType.TAX_MASTER,
             description="Tax Wizard - Indian tax calculations, all sections of Income Tax Act, regime comparison, deductions, capital gains",
             keywords=["tax", "income tax", "80c", "80d", "80ccd", "regime", "deduction", "capital gains", 
                      "ltcg", "stcg", "itr", "form 16", "tds", "advance tax", "assessment", "penalty",
@@ -129,11 +129,11 @@ class DhanSarthiCoordinator:
                 "Tax on LTCG from equity",
             ],
             confidence_threshold=0.5,
-            api_endpoint="/karvid/calculate-tax"
+            api_endpoint="/tax-master/calculate-tax"
         ),
-        AgentType.YOJANAKARTA: AgentCapability(
-            name="YojanaKarta",
-            agent_type=AgentType.YOJANAKARTA,
+        AgentType.RETIREMENT_PRO: AgentCapability(
+            name="RetirementPro",
+            agent_type=AgentType.RETIREMENT_PRO,
             description="Financial Planner - FIRE planning, SIP roadmaps, goal-based investing, retirement planning",
             keywords=["fire", "retire", "sip", "goal", "corpus", "retirement", "financial independence", 
                      "roadmap", "plan", "savings", "invest monthly", "target", "years", "compound"],
@@ -145,11 +145,11 @@ class DhanSarthiCoordinator:
                 "SIP for 1 crore in 15 years",
             ],
             confidence_threshold=0.6,
-            api_endpoint="/yojana/fire-number"
+            api_endpoint="/retirement-pro/fire-number"
         ),
-        AgentType.BAZAAR_GURU: AgentCapability(
-            name="BazaarGuru",
-            agent_type=AgentType.BAZAAR_GURU,
+        AgentType.STOCK_INSIGHT: AgentCapability(
+            name="StockInsight",
+            agent_type=AgentType.STOCK_INSIGHT,
             description="Market Researcher - NSE/BSE stock data, stock screening, market analysis, company information",
             keywords=["stock", "nse", "bse", "market", "price", "quote", "screener", "nifty", "sensex", 
                      "equity", "share", "company", "ipo", "listing", "gainer", "loser", "volume",
@@ -163,11 +163,11 @@ class DhanSarthiCoordinator:
                 "Is this stock good or bad?",
             ],
             confidence_threshold=0.5,
-            api_endpoint="/bazaar/stock-quote"
+            api_endpoint="/stock-insight/stock-quote"
         ),
-        AgentType.DHAN_RAKSHA: AgentCapability(
-            name="DhanRaksha",
-            agent_type=AgentType.DHAN_RAKSHA,
+        AgentType.MONEY_HEALTH: AgentCapability(
+            name="MoneyHealth",
+            agent_type=AgentType.MONEY_HEALTH,
             description="Financial Health Expert - 8-factor assessment, emergency fund, debt-to-income, savings rate, insurance",
             keywords=["health", "score", "emergency", "debt", "savings", "insurance", "credit", "financial health",
                      "checkup", "assess", "emergency fund", "ratio", "coverage", "readiness"],
@@ -179,11 +179,11 @@ class DhanSarthiCoordinator:
                 "Do I have enough emergency fund?",
             ],
             confidence_threshold=0.6,
-            api_endpoint="/dhan/health-score"
+            api_endpoint="/money-health/health-score"
         ),
-        AgentType.VIDHI: AgentCapability(
-            name="Vidhi",
-            agent_type=AgentType.VIDHI,
+        AgentType.COMPLIANCE_HELPER: AgentCapability(
+            name="ComplianceHelper",
+            agent_type=AgentType.COMPLIANCE_HELPER,
             description="Legal Advisor - SEBI regulations, Income Tax Act sections, Constitution provisions, RBI regulations, compliance",
             keywords=["sebi", "compliance", "legal", "disclaimer", "regulation", "advisor", "law", "act",
                      "constitution", "section", "rbi", "fema", "pmla", "court", "judgment", "rights",
@@ -197,11 +197,11 @@ class DhanSarthiCoordinator:
                 "Consumer Protection Act",
             ],
             confidence_threshold=0.5,
-            api_endpoint="/vidhi/disclaimers"
+            api_endpoint="/compliance-helper/disclaimers"
         ),
-        AgentType.LIFE_EVENT: AgentCapability(
-            name="Life Event Advisor",
-            agent_type=AgentType.LIFE_EVENT,
+        AgentType.LIFE_GOALS: AgentCapability(
+            name="LifeGoals",
+            agent_type=AgentType.LIFE_GOALS,
             description="Life Event Planner - Marriage, child birth, education, home buying financial planning",
             keywords=["marriage", "wedding", "married", "baby", "child", "birth", "education", 
                      "college", "school", "home buy", "house", "property", "life event",
@@ -214,11 +214,11 @@ class DhanSarthiCoordinator:
                 "Planning to buy a house in 5 years",
             ],
             confidence_threshold=0.5,
-            api_endpoint="/life-event/plan"
+            api_endpoint="/life-goals/plan"
         ),
-        AgentType.COUPLE_PLANNER: AgentCapability(
-            name="Couple's Planner",
-            agent_type=AgentType.COUPLE_PLANNER,
+        AgentType.PARTNER_FINANCE: AgentCapability(
+            name="PartnerFinance",
+            agent_type=AgentType.PARTNER_FINANCE,
             description="Joint Finance Manager - Shared budgets, expense splitting, joint debt payoff, couple's financial planning",
             keywords=["couple", "wife", "husband", "spouse", "partner", "joint", "together",
                      "split", "shared", "both of us", "we", "our budget", "combined",
@@ -231,7 +231,7 @@ class DhanSarthiCoordinator:
                 "Manage finances as a couple",
             ],
             confidence_threshold=0.5,
-            api_endpoint="/couple/finances"
+            api_endpoint="/partner-finance/finances"
         ),
     }
     
@@ -336,27 +336,27 @@ class DhanSarthiCoordinator:
                     score += 0.5
             
             # Extra bonus for section/article mentions (legal/tax queries)
-            if agent_type == AgentType.KARVID:
+            if agent_type == AgentType.TAX_MASTER:
                 if "section" in query_lower or "sec" in query_lower:
                     score += 2.0
-            if agent_type == AgentType.VIDHI:
+            if agent_type == AgentType.COMPLIANCE_HELPER:
                 if "article" in query_lower or "act" in query_lower:
                     score += 2.0
             
             # Stock symbol matching
-            if agent_type == AgentType.BAZAAR_GURU:
+            if agent_type == AgentType.STOCK_INSIGHT:
                 for symbol in ["reliance", "tcs", "infosys", "hdfc", "icici", "happiestminds", "happstmnds"]:
                     if symbol in query_lower:
                         score += 2.0
             
             # Life event priority: marriage/baby/education get strong boost
-            if agent_type == AgentType.LIFE_EVENT:
+            if agent_type == AgentType.LIFE_GOALS:
                 for trigger in ["marriage", "wedding", "married", "baby", "child", "birth", "education", "college"]:
                     if trigger in query_lower:
                         score += 3.0  # Strong boost to override Yojana's generic "plan"
             
             # Couple planner priority: couple/wife/husband/joint get strong boost
-            if agent_type == AgentType.COUPLE_PLANNER:
+            if agent_type == AgentType.PARTNER_FINANCE:
                 for trigger in ["couple", "wife", "husband", "spouse", "partner", "joint", "both of us"]:
                     if trigger in query_lower:
                         score += 3.0  # Strong boost to override Yojana's generic "plan"
@@ -370,7 +370,7 @@ class DhanSarthiCoordinator:
             agent_scores = {k: v/max_score for k, v in agent_scores.items()}
         
         # Get primary agent (highest score)
-        primary_agent = max(agent_scores.items(), key=lambda x: x[1]) if agent_scores else (AgentType.DHAN_RAKSHA, 0.0)
+        primary_agent = max(agent_scores.items(), key=lambda x: x[1]) if agent_scores else (AgentType.MONEY_HEALTH, 0.0)
         
         # Get secondary agents (score > 0.3)
         secondary_agents = [a for a, s in agent_scores.items() if s > 0.3 and a != primary_agent[0]]
@@ -394,46 +394,46 @@ class DhanSarthiCoordinator:
     
     def _determine_intent(self, query: str, agent: AgentType) -> str:
         """Determine the specific intent within an agent"""
-        if agent == AgentType.NIVESHAK:
+        if agent == AgentType.PORTFOLIO_WISE:
             if "xirr" in query: return "calculate_xirr"
             if "risk" in query: return "analyze_risk"
             if "holding" in query or "portfolio" in query: return "show_holdings"
             return "analyze_portfolio"
         
-        elif agent == AgentType.KARVID:
+        elif agent == AgentType.TAX_MASTER:
             if "regime" in query or "which regime" in query: return "compare_regimes"
             if "80c" in query or "80d" in query: return "calculate_deductions"
             if "section" in query: return "explain_section"
             if "capital gain" in query or "ltcg" in query or "stcg" in query: return "calculate_capital_gains"
             return "calculate_tax"
         
-        elif agent == AgentType.YOJANAKARTA:
+        elif agent == AgentType.RETIREMENT_PRO:
             if "fire" in query: return "calculate_fire_number"
             if "sip" in query: return "plan_sip"
             if "retire" in query: return "plan_retirement"
             return "plan_finances"
         
-        elif agent == AgentType.BAZAAR_GURU:
+        elif agent == AgentType.STOCK_INSIGHT:
             if "price" in query or "quote" in query: return "get_stock_price"
             if "screen" in query: return "screen_stocks"
             if "good" in query or "bad" in query or "analysis" in query: return "analyze_stock"
             return "market_overview"
         
-        elif agent == AgentType.DHAN_RAKSHA:
+        elif agent == AgentType.MONEY_HEALTH:
             return "calculate_health_score"
         
-        elif agent == AgentType.VIDHI:
+        elif agent == AgentType.COMPLIANCE_HELPER:
             if "section" in query: return "explain_section"
             if "sebi" in query: return "sebi_regulations"
             if "article" in query: return "constitution_article"
             return "get_disclaimers"
         
-        elif agent == AgentType.LIFE_EVENT:
+        elif agent == AgentType.LIFE_GOALS:
             if "type" in query: return "get_event_types"
             if any(w in query for w in ["comprehensive", "full", "detailed"]): return "comprehensive_plan"
             return "plan_life_event"
         
-        elif agent == AgentType.COUPLE_PLANNER:
+        elif agent == AgentType.PARTNER_FINANCE:
             if "split" in query: return "split_expense"
             if "budget" in query: return "couple_budget"
             if "debt" in query: return "couple_debt_payoff"
