@@ -1,5 +1,5 @@
 """
-DhanRaksha Agent - Financial Health Score
+MoneyHealth Agent - Financial Health Score
 Comprehensive financial health assessment
 """
 

@@ -4,21 +4,19 @@ import { prisma } from '@/lib/prisma'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { telegramId, email } = body
+    const { email } = body
 
-    if (!telegramId && !email) {
+    if (!email) {
       return NextResponse.json(
-        { error: 'Please provide either telegramId or email' },
+        { error: 'Email is required' },
         { status: 400 }
       )
     }
 
-    let user = null
-    if (telegramId) {
-      user = await prisma.user.findUnique({ where: { telegramId } })
-    } else if (email) {
-      user = await prisma.user.findUnique({ where: { email } })
-    }
+    // Find user by email
+    const user = await prisma.user.findUnique({ 
+      where: { email: email.toLowerCase() } 
+    })
 
     if (!user) {
       return NextResponse.json(
@@ -27,7 +25,16 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    return NextResponse.json({ user })
+    return NextResponse.json({ 
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        phone: user.phone,
+        authToken: user.authToken,
+      },
+      message: 'Login successful' 
+    })
   } catch (error: any) {
     console.error('Login error:', error)
     return NextResponse.json(

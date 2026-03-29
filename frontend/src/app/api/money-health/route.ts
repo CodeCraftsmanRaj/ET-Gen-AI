@@ -6,8 +6,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
 
-    // Assuming the body is { "holdings": [...] }
-    const response = await fetch(`${BACKEND_URL}/niveshak/analyze`, {
+    const response = await fetch(`${BACKEND_URL}/money-health/health-score`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),

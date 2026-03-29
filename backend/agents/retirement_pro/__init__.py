@@ -1,5 +1,5 @@
 """
-YojanaKarta Agent - Financial Planner
+RetirementPro Agent - Financial Planner
 FIRE (Financial Independence, Retire Early) Calculator for India
 """
 

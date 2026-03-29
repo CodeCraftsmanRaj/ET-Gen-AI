@@ -1,11 +1,16 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8000'
 
-export async function GET() {
+export async function POST(request: NextRequest) {
   try {
-    const response = await fetch(`${BACKEND_URL}/vidhi/disclaimers`, {
-      method: 'GET',
+    const body = await request.json()
+
+    // Assuming the body is { "holdings": [...] }
+    const response = await fetch(`${BACKEND_URL}/portfolio-wise/analyze`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
     })
 
     if (!response.ok) {
